@@ -5,6 +5,12 @@ const char kWindowTitle[] = "GC2B_15_ヒラジマ_ヒデマサ＿MT3";
 struct Matrix4x4 {
 	float m[4][4];
 };
+/// <summary>
+/// 加法
+/// </summary>
+/// <param name="a"></param>
+/// <param name="b"></param>
+/// <returns></returns>
 Matrix4x4 Add(Matrix4x4 a,Matrix4x4 b) { 
 	Matrix4x4 result{};
 	result.m[0][0]=a.m[0][0] + b.m[0][0];
@@ -25,6 +31,12 @@ Matrix4x4 Add(Matrix4x4 a,Matrix4x4 b) {
 	result.m[3][3]=a.m[3][3] + b.m[3][3];
 	return result;
 };
+/// <summary>
+/// 減法
+/// </summary>
+/// <param name="a"></param>
+/// <param name="b"></param>
+/// <returns></returns>
 Matrix4x4 Subtraction(Matrix4x4 a, Matrix4x4 b) {
 	Matrix4x4 result{};
 	result.m[0][0] = a.m[0][0] - b.m[0][0];
@@ -45,7 +57,13 @@ Matrix4x4 Subtraction(Matrix4x4 a, Matrix4x4 b) {
 	result.m[3][3] = a.m[3][3] - b.m[3][3];
 	return result;
 };
-Matrix4x4 Multiplication(Matrix4x4 a, float k) {
+/// <summary>
+/// スカラー
+/// </summary>
+/// <param name="a"></param>
+/// <param name="k"></param>
+/// <returns></returns>
+Matrix4x4 Scalar(Matrix4x4 a, float k) {
 	Matrix4x4 result{};
 	result.m[0][0] = a.m[0][0] * k;
 	result.m[0][1] = a.m[0][1] * k;
@@ -65,7 +83,12 @@ Matrix4x4 Multiplication(Matrix4x4 a, float k) {
 	result.m[3][3] = a.m[3][3] * k;
 	return result;
 };
-Matrix4x4 identity (Matrix4x4 a) {
+/// <summary>
+/// 単位行列
+/// </summary>
+/// <param name="a"></param>
+/// <returns></returns>
+Matrix4x4 MakeIdentity (Matrix4x4 a) {
 	Matrix4x4 result{};
 	result.m[0][0] = 1;
 	result.m[0][1] = 0;
@@ -85,7 +108,7 @@ Matrix4x4 identity (Matrix4x4 a) {
 	result.m[3][3] = 1;
 	return result;
 };
-Matrix4x4 identity(Matrix4x4 a, Matrix4x4 b) { 
+Matrix4x4 Multiplication(Matrix4x4 a, Matrix4x4 b) { 
 	Matrix4x4 result{};
 	result.m[0][0] = a.m[0][0]*b.m[0][0] + a.m[0][1]*b.m[1][0] + a.m[0][2]*b.m[2][0] + a.m[0][3]*b.m[3][0];//ｍｔ資料1列
 	result.m[0][1] = a.m[0][0]*b.m[0][1] + a.m[0][1]*b.m[1][1] + a.m[0][2]*b.m[2][1] + a.m[0][3]*b.m[3][1];//2列
@@ -108,17 +131,49 @@ Matrix4x4 identity(Matrix4x4 a, Matrix4x4 b) {
 	result.m[3][3] = a.m[3][0]*b.m[0][3] + a.m[3][1]*b.m[1][3] + a.m[3][2]*b.m[2][3] + a.m[3][3]*b.m[3][3];//4列
 	return result;
 }
-Matrix4x4 Reverse(Matrix4x4 a, Matrix4x4 b) { 
+Matrix4x4 Inverse(Matrix4x4 a, Matrix4x4 b) { 
 	Matrix4x4 result{};
-	result.m[0][0] = a.m[1][1]*a.m[2][2]*a.m[3][3] + a.m[1][2]*a.m[2][3]*a.m[3][1] + a.m[1][2]*a.m[2][1]*a.m[3][2] 
-		           - a.m[1][3]*a.m[2][2]*a.m[3][3] - a.m[1][1]*a.m[2][1]*a.m[3][1] - a.m[1][1]*a.m[2][3]*a.m[3][2] 
-	result.m[0][1]= 
-	result.m[0][2]=
-	result.m[0][3]=
+	result.m[0][0] =  a.m[1][1]*a.m[2][2]*a.m[3][3] + a.m[1][2]*a.m[2][3]*a.m[3][1] + a.m[1][3]*a.m[2][1]*a.m[3][2] 
+		            - a.m[1][3]*a.m[2][2]*a.m[3][1] - a.m[1][2]*a.m[2][1]*a.m[3][3] - a.m[1][1]*a.m[2][3]*a.m[3][2];
+	result.m[0][1] = -a.m[0][1]*a.m[2][2]*a.m[3][3] - a.m[0][2]*a.m[2][3]*a.m[3][1] - a.m[0][3]*a.m[2][1]*a.m[3][2] 
+		            + a.m[1][3]*a.m[2][2]*a.m[3][1] + a.m[0][2]*a.m[2][1]*a.m[3][3] + a.m[0][1]*a.m[2][3]*a.m[3][2];
+	result.m[0][2] =  a.m[0][1]*a.m[1][2]*a.m[3][3] + a.m[0][2]*a.m[1][3]*a.m[3][1] + a.m[0][3]*a.m[1][1]*a.m[3][2] 
+		            - a.m[1][3]*a.m[1][2]*a.m[3][1] - a.m[0][2]*a.m[1][1]*a.m[3][3] - a.m[0][1]*a.m[1][3]*a.m[3][2];
+	result.m[0][3] = -a.m[0][1]*a.m[1][2]*a.m[2][3] - a.m[0][2]*a.m[1][3]*a.m[2][1] - a.m[0][3]*a.m[1][1]*a.m[2][2] 
+		            + a.m[1][3]*a.m[1][2]*a.m[2][1] + a.m[0][2]*a.m[1][1]*a.m[2][3] + a.m[0][1]*a.m[1][3]*a.m[2][2];
 
+	result.m[1][0] =  a.m[1][1]*a.m[2][2]*a.m[3][3] + a.m[1][2]*a.m[2][3]*a.m[3][1] + a.m[1][3]*a.m[2][0]*a.m[3][2] 
+		            - a.m[1][3]*a.m[2][2]*a.m[3][0] - a.m[1][2]*a.m[2][0]*a.m[3][3] - a.m[1][1]*a.m[2][3]*a.m[3][2];
+	result.m[1][1] = -a.m[0][1]*a.m[2][2]*a.m[3][3] - a.m[0][2]*a.m[2][3]*a.m[3][1] - a.m[0][3]*a.m[2][0]*a.m[3][2] 
+		            + a.m[1][3]*a.m[2][2]*a.m[3][0] + a.m[0][2]*a.m[2][0]*a.m[3][3] + a.m[0][1]*a.m[2][3]*a.m[3][2];
+	result.m[1][2] =  a.m[0][1]*a.m[1][2]*a.m[3][3] + a.m[0][2]*a.m[1][3]*a.m[3][1] + a.m[0][3]*a.m[1][0]*a.m[3][2] 
+		            - a.m[1][3]*a.m[1][2]*a.m[3][0] - a.m[0][2]*a.m[1][0]*a.m[3][3] - a.m[0][1]*a.m[1][3]*a.m[3][2];
+	result.m[1][3] = -a.m[0][1]*a.m[1][2]*a.m[2][3] - a.m[0][2]*a.m[1][3]*a.m[2][1] - a.m[0][3]*a.m[1][0]*a.m[2][2] 
+		            + a.m[1][3]*a.m[1][2]*a.m[2][0] + a.m[0][2]*a.m[1][0]*a.m[2][3] + a.m[0][1]*a.m[1][3]*a.m[2][2];
 
+	result.m[2][0] =  a.m[1][0]*a.m[2][1]*a.m[3][3] + a.m[1][1]*a.m[2][3]*a.m[3][0] + a.m[1][3]*a.m[2][0]*a.m[3][1] 
+		            - a.m[1][3]*a.m[2][1]*a.m[3][0] - a.m[1][1]*a.m[2][0]*a.m[3][3] - a.m[1][0]*a.m[2][3]*a.m[3][1];
+	result.m[2][1] = -a.m[0][0]*a.m[2][1]*a.m[3][3] - a.m[0][1]*a.m[2][3]*a.m[3][0] - a.m[0][3]*a.m[2][0]*a.m[3][1] 
+		            + a.m[1][3]*a.m[2][1]*a.m[3][0] + a.m[0][1]*a.m[2][0]*a.m[3][3] + a.m[0][0]*a.m[2][3]*a.m[3][1];
+	result.m[2][2] =  a.m[0][0]*a.m[1][1]*a.m[3][3] + a.m[0][1]*a.m[1][3]*a.m[3][0] + a.m[0][3]*a.m[1][0]*a.m[3][1] 
+		            - a.m[1][3]*a.m[1][1]*a.m[3][0] - a.m[0][1]*a.m[1][0]*a.m[3][3] - a.m[0][0]*a.m[1][3]*a.m[3][1];
+	result.m[2][3] = -a.m[0][0]*a.m[1][1]*a.m[2][3] - a.m[0][1]*a.m[1][3]*a.m[2][0] - a.m[0][3]*a.m[1][0]*a.m[2][1] 
+		            + a.m[1][3]*a.m[1][1]*a.m[2][0] + a.m[0][1]*a.m[1][0]*a.m[2][3] + a.m[0][0]*a.m[1][3]*a.m[2][1];
 
+	result.m[3][0] =  a.m[1][0]*a.m[2][1]*a.m[3][2] + a.m[1][1]*a.m[2][2]*a.m[3][0] + a.m[1][2]*a.m[2][0]*a.m[3][1] 
+		            - a.m[1][2]*a.m[2][1]*a.m[3][0] - a.m[1][1]*a.m[2][0]*a.m[3][2] - a.m[1][0]*a.m[2][2]*a.m[3][1];
+	result.m[3][1] = -a.m[0][0]*a.m[2][1]*a.m[3][2] - a.m[0][1]*a.m[2][2]*a.m[3][0] - a.m[0][2]*a.m[2][0]*a.m[3][1] 
+		            + a.m[0][2]*a.m[2][1]*a.m[3][0] + a.m[0][1]*a.m[2][0]*a.m[3][2] + a.m[0][0]*a.m[2][2]*a.m[3][1];
+	result.m[3][2] =  a.m[0][0]*a.m[1][1]*a.m[3][2] + a.m[0][1]*a.m[1][2]*a.m[3][0] + a.m[0][2]*a.m[1][0]*a.m[3][1] 
+		            - a.m[0][2]*a.m[1][1]*a.m[3][0] - a.m[0][1]*a.m[1][0]*a.m[3][2] - a.m[0][0]*a.m[1][2]*a.m[3][1];
+	result.m[3][3] = -a.m[0][0]*a.m[1][1]*a.m[2][2] - a.m[0][1]*a.m[1][2]*a.m[2][0] - a.m[0][2]*a.m[1][0]*a.m[2][1] 
+		            + a.m[0][2]*a.m[1][1]*a.m[2][0] + a.m[0][1]*a.m[1][0]*a.m[2][2] + a.m[0][0]*a.m[1][2]*a.m[2][1];
 
+    return result;
+}
+Matrix4x4 Transpose(const Matrix4x4 a) { 
+	Matrix4x4 retult{};
+	retult
 
 
 
