@@ -2,6 +2,130 @@
 
 const char kWindowTitle[] = "GC2B_15_ヒラジマ_ヒデマサ＿MT3";
 
+struct Matrix4x4 {
+	float m[4][4];
+};
+Matrix4x4 Add(Matrix4x4 a,Matrix4x4 b) { 
+	Matrix4x4 result{};
+	result.m[0][0]=a.m[0][0] + b.m[0][0];
+	result.m[0][1]=a.m[0][1] + b.m[0][1];
+	result.m[0][2]=a.m[0][2] + b.m[0][2];
+	result.m[0][3]=a.m[0][3] + b.m[0][3];
+	result.m[1][0]=a.m[1][0] + b.m[1][0];
+	result.m[1][1]=a.m[1][1] + b.m[1][1];
+	result.m[1][2]=a.m[1][2] + b.m[1][2];
+	result.m[1][3]=a.m[1][3] + b.m[1][3];
+	result.m[2][0]=a.m[2][0] + b.m[2][0];
+	result.m[2][1]=a.m[2][1] + b.m[2][1];
+	result.m[2][2]=a.m[2][2] + b.m[2][2];
+	result.m[2][3]=a.m[2][3] + b.m[2][3];
+	result.m[3][0]=a.m[3][0] + b.m[3][0];
+	result.m[3][1]=a.m[3][1] + b.m[3][1];
+	result.m[3][2]=a.m[3][2] + b.m[3][2];
+	result.m[3][3]=a.m[3][3] + b.m[3][3];
+	return result;
+};
+Matrix4x4 Subtraction(Matrix4x4 a, Matrix4x4 b) {
+	Matrix4x4 result{};
+	result.m[0][0] = a.m[0][0] - b.m[0][0];
+	result.m[0][1] = a.m[0][1] - b.m[0][1];
+	result.m[0][2] = a.m[0][2] - b.m[0][2];
+	result.m[0][3] = a.m[0][3] - b.m[0][3];
+	result.m[1][0] = a.m[1][0] - b.m[1][0];
+	result.m[1][1] = a.m[1][1] - b.m[1][1];
+	result.m[1][2] = a.m[1][2] - b.m[1][2];
+	result.m[1][3] = a.m[1][3] - b.m[1][3];
+	result.m[2][0] = a.m[2][0] - b.m[2][0];
+	result.m[2][1] = a.m[2][1] - b.m[2][1];
+	result.m[2][2] = a.m[2][2] - b.m[2][2];
+	result.m[2][3] = a.m[2][3] - b.m[2][3];
+	result.m[3][0] = a.m[3][0] - b.m[3][0];
+	result.m[3][1] = a.m[3][1] - b.m[3][1];
+	result.m[3][2] = a.m[3][2] - b.m[3][2];
+	result.m[3][3] = a.m[3][3] - b.m[3][3];
+	return result;
+};
+Matrix4x4 Multiplication(Matrix4x4 a, float k) {
+	Matrix4x4 result{};
+	result.m[0][0] = a.m[0][0] * k;
+	result.m[0][1] = a.m[0][1] * k;
+	result.m[0][2] = a.m[0][2] * k;
+	result.m[0][3] = a.m[0][3] * k;
+	result.m[1][0] = a.m[1][0] * k;
+	result.m[1][1] = a.m[1][1] * k;
+	result.m[1][2] = a.m[1][2] * k;
+	result.m[1][3] = a.m[1][3] * k;
+	result.m[2][0] = a.m[2][0] * k;
+	result.m[2][1] = a.m[2][1] * k;
+	result.m[2][2] = a.m[2][2] * k;
+	result.m[2][3] = a.m[2][3] * k;
+	result.m[3][0] = a.m[3][0] * k;
+	result.m[3][1] = a.m[3][1] * k;
+	result.m[3][2] = a.m[3][2] * k;
+	result.m[3][3] = a.m[3][3] * k;
+	return result;
+};
+Matrix4x4 identity (Matrix4x4 a) {
+	Matrix4x4 result{};
+	result.m[0][0] = 1;
+	result.m[0][1] = 0;
+	result.m[0][2] = 0;
+	result.m[0][3] = 0;
+	result.m[1][0] = 0;
+	result.m[1][1] = 1;
+	result.m[1][2] = 0;
+	result.m[1][3] = 0;
+	result.m[2][0] = 0;
+	result.m[2][1] = 0;
+	result.m[2][2] = 1;
+	result.m[2][3] = 0;
+	result.m[3][0] = 0;
+	result.m[3][1] = 0;
+	result.m[3][2] = 0;
+	result.m[3][3] = 1;
+	return result;
+};
+Matrix4x4 identity(Matrix4x4 a, Matrix4x4 b) { 
+	Matrix4x4 result{};
+	result.m[0][0] = a.m[0][0]*b.m[0][0] + a.m[0][1]*b.m[1][0] + a.m[0][2]*b.m[2][0] + a.m[0][3]*b.m[3][0];//ｍｔ資料1列
+	result.m[0][1] = a.m[0][0]*b.m[0][1] + a.m[0][1]*b.m[1][1] + a.m[0][2]*b.m[2][1] + a.m[0][3]*b.m[3][1];//2列
+	result.m[0][2] = a.m[0][0]*b.m[0][2] + a.m[0][1]*b.m[1][2] + a.m[0][2]*b.m[2][2] + a.m[0][3]*b.m[3][2];//3列
+	result.m[0][3] = a.m[0][0]*b.m[0][3] + a.m[0][1]*b.m[1][3] + a.m[0][2]*b.m[2][3] + a.m[0][3]*b.m[3][3];//4列
+
+	result.m[1][0] = a.m[1][0]*b.m[0][0] + a.m[1][1]*b.m[1][0] + a.m[1][2]*b.m[2][0] + a.m[1][3]*b.m[3][0];//1
+	result.m[1][1] = a.m[1][0]*b.m[0][1] + a.m[1][1]*b.m[1][1] + a.m[1][2]*b.m[2][1] + a.m[1][3]*b.m[3][1];//2列
+	result.m[1][2] = a.m[1][0]*b.m[0][2] + a.m[1][1]*b.m[1][2] + a.m[1][2]*b.m[2][2] + a.m[1][3]*b.m[3][2];//3列
+	result.m[1][3] = a.m[1][0]*b.m[0][3] + a.m[1][1]*b.m[1][3] + a.m[1][2]*b.m[2][3] + a.m[1][3]*b.m[3][3];//4列
+
+	result.m[2][0] = a.m[2][0]*b.m[0][0] + a.m[2][1]*b.m[1][0] + a.m[2][2]*b.m[2][0] + a.m[2][3]*b.m[3][0];//1
+	result.m[2][1] = a.m[2][0]*b.m[0][1] + a.m[2][1]*b.m[1][1] + a.m[2][2]*b.m[2][1] + a.m[2][3]*b.m[3][1];//2列
+	result.m[2][2] = a.m[2][0]*b.m[0][2] + a.m[2][1]*b.m[1][2] + a.m[2][2]*b.m[2][2] + a.m[2][3]*b.m[3][2];//3列
+	result.m[2][3] = a.m[2][0]*b.m[0][3] + a.m[2][1]*b.m[1][3] + a.m[2][2]*b.m[2][3] + a.m[2][3]*b.m[3][3];//4列
+
+	result.m[3][0] = a.m[3][0]*b.m[0][0] + a.m[3][1]*b.m[1][0] + a.m[3][2]*b.m[2][0] + a.m[3][3]*b.m[3][0];//1
+	result.m[3][1] = a.m[3][0]*b.m[0][1] + a.m[3][1]*b.m[1][1] + a.m[3][2]*b.m[2][1] + a.m[3][3]*b.m[3][1];//2列
+	result.m[3][2] = a.m[3][0]*b.m[0][2] + a.m[3][1]*b.m[1][2] + a.m[3][2]*b.m[2][2] + a.m[3][3]*b.m[3][2];//3列
+	result.m[3][3] = a.m[3][0]*b.m[0][3] + a.m[3][1]*b.m[1][3] + a.m[3][2]*b.m[2][3] + a.m[3][3]*b.m[3][3];//4列
+	return result;
+}
+Matrix4x4 Reverse(Matrix4x4 a, Matrix4x4 b) { 
+	Matrix4x4 result{};
+	result.m[0][0] = a.m[1][1]*a.m[2][2]*a.m[3][3] + a.m[1][2]*a.m[2][3]*a.m[3][1] + a.m[1][2]*a.m[2][1]*a.m[3][2] 
+		           - a.m[1][3]*a.m[2][2]*a.m[3][3] - a.m[1][1]*a.m[2][1]*a.m[3][1] - a.m[1][1]*a.m[2][3]*a.m[3][2] 
+	result.m[0][1]= 
+	result.m[0][2]=
+	result.m[0][3]=
+
+
+
+
+
+
+
+
+
+}
+
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
