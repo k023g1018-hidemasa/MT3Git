@@ -2,6 +2,30 @@
 
 const char kWindowTitle[] = "GC2B_15_ヒラジマ_ヒデマサ＿MT3";
 
+
+
+struct Matrix4x4 {
+	float m[4][4];
+};
+struct Vector3 {
+	float x, y, z;
+};
+
+Matrix4x4 MakeTranslateMatrix(const Vector3& translate);
+
+Matrix4x4 MakeScaleMatrix(const Vector3& scale);
+
+Vector3 Transform(const Vector3& vector, const Matrix4x4& mattrix);
+
+
+
+
+
+
+
+
+
+
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
