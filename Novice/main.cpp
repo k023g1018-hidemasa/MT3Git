@@ -11,11 +11,39 @@ struct Vector3 {
 	float x, y, z;
 };
 
-Matrix4x4 MakeTranslateMatrix(const Vector3& translate);
+//平行
+Matrix4x4 MakeTranslateMatrix(const Vector3& translate){
+	Matrix4x4 result{};
+	result.m[0][0] = 1;
+	result.m[1][1] = 1;
+	result.m[2][2] = 1;
+	result.m[3][3] = 1;
 
-Matrix4x4 MakeScaleMatrix(const Vector3& scale);
+	result.m[3][0] = translate.x;
+	result.m[3][1] = translate.y;
+	result.m[3][2] = translate.z;
 
-Vector3 Transform(const Vector3& vector, const Matrix4x4& mattrix);
+};
+//拡縮
+Matrix4x4 MakeScaleMatrix(const Vector3& scale){
+	Matrix4x4 result{};
+	result.m[0][0] = scale.x;
+	result.m[1][1] = scale.y;
+	result.m[2][2] = scale.z;
+	result.m[3][3] = 1;
+
+};
+
+Vector3 Transform(const Vector3& vector, const Matrix4x4& mattrix){
+
+
+
+
+
+
+
+
+};
 
 
 
