@@ -72,10 +72,11 @@ Matrix4x4 Multiply(Matrix4x4 a, Matrix4x4 b) {
 	return result;
 }
 
-void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* ladel) {
+void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label) {
+	Novice::ScreenPrintf(x, y-20, "%s", label);
 	for (int row = 0; row < 4; ++row) {
 		for (int column = 0; column < 4; ++column) {
-			Novice::ScreenPrintf(x + column * kColumnWidth, y + row * kRowHeight, "%6.02f", matrix.m[row][column], ladel);
+			Novice::ScreenPrintf(x + column * kColumnWidth, y + row * kRowHeight, "%6.02f", matrix.m[row][column]);
 		}
 	}
 }
@@ -120,10 +121,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 
-		MatrixScreenPrintf(0, 0, rotateXMatrix, "rotateXMatrix");
-		MatrixScreenPrintf(0, kRowHeight * 5, rotateYMatrix, "roatteYMatirx");
-		MatrixScreenPrintf(0, kRowHeight * 5*2, rotateZMatrix, "roatteZMatirx");
-		MatrixScreenPrintf(0, kRowHeight * 5*3, rotateXYZMatrix, "roatteXYZMatirx");
+		MatrixScreenPrintf(0, 20, rotateXMatrix, "rotateXMatrix");
+		MatrixScreenPrintf(0, kRowHeight * 5+20, rotateYMatrix, "roatteYMatirx");
+		MatrixScreenPrintf(0, kRowHeight * 5*2+20, rotateZMatrix, "roatteZMatirx");
+		MatrixScreenPrintf(0, kRowHeight * 5*3+20, rotateXYZMatrix, "roatteXYZMatirx");
 
 
 
