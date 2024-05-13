@@ -10,9 +10,10 @@ struct Matrix4x4 {
 	float m[4][4];
 };
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix,const char* ladel) { 
+	Novice::ScreenPrintf(x, y - 20, "%s", ladel);
 	for (int row = 0; row < 4; ++row) {
 		for (int column = 0; column < 4; ++column) {
-			Novice::ScreenPrintf(x + column * kColumnWidth, y + row * kRowHeight, "%6.02f", matrix.m[row][column],ladel);
+			Novice::ScreenPrintf(x + column * kColumnWidth, y + row * kRowHeight, "%6.02f", matrix.m[row][column]);
 		}
 	}
 
@@ -180,7 +181,7 @@ Matrix4x4 Inverse(Matrix4x4 a) {
 		             +a.m[0][2]*a.m[1][1]*a.m[3][0] + a.m[0][1]*a.m[1][0]*a.m[3][2] + a.m[0][0]*a.m[1][2]*a.m[3][1];
 	result.m[3][3] = +a.m[0][0]*a.m[1][1]*a.m[2][2] + a.m[0][1]*a.m[1][2]*a.m[2][0] + a.m[0][2]*a.m[1][0]*a.m[2][1] 
 		            - a.m[0][2]*a.m[1][1]*a.m[2][0] - a.m[0][1]*a.m[1][0]*a.m[2][2] - a.m[0][0]*a.m[1][2]*a.m[2][1];
-
+	//10ページのAをあたまにいれて今作ってるやつはA()でおけ
     return result;
 }
 /// <summary>
@@ -259,14 +260,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 		
-	MatrixScreenPrintf(0, 0, resultAdd, " Add");
-	MatrixScreenPrintf(0, kRowHeight*5, resultSubtract, "Subtract");
-	MatrixScreenPrintf(0, kRowHeight * 5*2, resultMultiply, "Multiply");
-	MatrixScreenPrintf(0, kRowHeight * 5 * 3, inverseM1, "inverseM1");
-	MatrixScreenPrintf(0, kRowHeight * 5 * 4, invarseM2, "inverseM2");
-	MatrixScreenPrintf(kColumnWidth*5,0 , transposeM1, "transposeM1");
-	MatrixScreenPrintf(kColumnWidth * 5, kRowHeight*5, transposeM2, "transposeM2");
-	MatrixScreenPrintf(kColumnWidth * 5, kRowHeight * 5*2,identity, "identity");
+	MatrixScreenPrintf(0, 0+20, resultAdd, " Add");
+		MatrixScreenPrintf(0, kRowHeight * 5 + 20, resultSubtract, "Subtract");
+	MatrixScreenPrintf(0, kRowHeight * 5 * 2 + 20, resultMultiply, "Multiply");
+		MatrixScreenPrintf(0, kRowHeight * 5 * 3 + 20, inverseM1, "inverseM1");
+	MatrixScreenPrintf(0, kRowHeight * 5 * 4 + 20, invarseM2, "inverseM2");
+		MatrixScreenPrintf(kColumnWidth * 5, 0+20, transposeM1, "transposeM1");
+	MatrixScreenPrintf(kColumnWidth * 5, kRowHeight * 5 + 20, transposeM2, "transposeM2");
+	MatrixScreenPrintf(kColumnWidth * 5, kRowHeight * 5 * 2 + 20, identity, "identity");
 
 		///
 		/// ↑描画処理ここまで
