@@ -39,8 +39,8 @@ Matrix4x4 MakeRotateYMatrix(float radian){
 Matrix4x4 MakeRotateZMatrix(float radian) { 
 	Matrix4x4 result{};
 	result.m[0][0] = std::cos(radian);
-	result.m[0][1] = -std::sin(radian);
-	result.m[1][0] = std::sin(radian);
+	result.m[0][1] = std::sin(radian);
+	result.m[1][0] = -std::sin(radian);
 	result.m[1][1] = std::cos(radian);
 	result.m[2][2] = 1;
 	result.m[3][3] = 1;
