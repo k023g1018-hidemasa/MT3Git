@@ -69,7 +69,7 @@ Matrix4x4 Multiply(Matrix4x4 a, Matrix4x4 b) {
 	result.m[3][3] = a.m[3][0] * b.m[0][3] + a.m[3][1] * b.m[1][3] + a.m[3][2] * b.m[2][3] + a.m[3][3] * b.m[3][3]; // 4列
 	return result;
 }
-Matrix4x4 Scalar(const Vector3& a) {
+Matrix4x4 Scale(const Vector3& a) {
 	Matrix4x4 result{};
 	result.m[0][0] = a.x;
 	result.m[1][1] = a.y;
@@ -94,9 +94,9 @@ Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Ve
 	Matrix4x4 rotateXMatrix = MakeRotateXMatrix(rotate.x);
 	Matrix4x4 rotateYMatrix = MakeRotateYMatrix(rotate.y);
 	Matrix4x4 rotateZMatrix = MakeRotateZMatrix(rotate.z);
-	Matrix4x4 rotateXYZMatrix = Multiply(Multiply(rotateXMatrix, rotateYMatrix), rotateZMatrix); // Multiply(rotateXMatrix, Multiply(rotateYMatrix, rotateZMatrix));
+	Matrix4x4 rotateXYZMatrix =Multiply(rotateXMatrix, Multiply(rotateYMatrix, rotateZMatrix));
 
-	return Multiply(Scalar(scale), Multiply(rotateXYZMatrix, MakeTranslateMatrix(translate)));
+	return Multiply(Multiply(スケール,rotateXYZMatrix),MakeTranslateMatrix(translate));
 };
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label) {
 	Novice::ScreenPrintf(x, y - 20, "%s", label);
