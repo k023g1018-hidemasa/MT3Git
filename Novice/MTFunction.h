@@ -96,7 +96,7 @@ Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Ve
 	Matrix4x4 rotateZMatrix = MakeRotateZMatrix(rotate.z);
 	Matrix4x4 rotateXYZMatrix =Multiply(rotateXMatrix, Multiply(rotateYMatrix, rotateZMatrix));
 
-	return Multiply(Multiply(スケール,rotateXYZMatrix),MakeTranslateMatrix(translate));
+	return Multiply(Multiply(Scale(scale), rotateXYZMatrix), MakeTranslateMatrix(translate));
 };
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label) {
 	Novice::ScreenPrintf(x, y - 20, "%s", label);
