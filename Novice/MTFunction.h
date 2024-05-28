@@ -99,18 +99,6 @@ Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Ve
 	return Multiply(Multiply(Scale(scale), rotateXYZMatrix), MakeTranslateMatrix(translate));
 };
 
-// 透視投影行列
-Matrix4x4 MakePerspectiveMatrix(float forY, float aspectRatio, float nearClip, float farClip) {
-	Matrix4x4 resurt{};
-	float s = 1; // しらん
-	float cot = 1 / (std::tan(s));
-	resurt.m[0][0] = 1 / aspectRatio * cot * (forY / 2);
-	resurt.m[1][1] = cot * (forY / 2);
-	resurt.m[2][2] = farClip / (farClip - nearClip);
-	resurt.m[2][3] = -nearClip * farClip / (farClip - nearClip);
-	resurt.m[3][2] = 1;
-	return resurt;
-};
 // 正射影行列
 Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip) {
 	Matrix4x4 resurt{};
@@ -121,6 +109,18 @@ Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float botto
 	resurt.m[3][0] = (left + right) / (left - right);
 	resurt.m[3][1] = (top + bottom) / (bottom - top);
 	resurt.m[3][2] = nearClip / (nearClip - farClip);
+	return resurt;
+};
+// 透視投影行列
+Matrix4x4 MakePerspectiveMatrix(float forY, float aspectRatio, float nearClip, float farClip) {
+	Matrix4x4 resurt{};
+	float s = 1; // しらんa/bってなんやねんもっと分かりやすくかけやヴぉけ
+	float cot = 1 / (std::tan(s));
+	resurt.m[0][0] = 1 / aspectRatio * cot * (forY / 2);
+	resurt.m[1][1] = cot * (forY / 2);
+	resurt.m[2][2] = farClip / (farClip - nearClip);
+	resurt.m[2][3] = 1;
+	resurt.m[3][2] = -nearClip* farClip / (farClip - nearClip);
 	return resurt;
 };
 // ビューポート変換行列
