@@ -14,6 +14,14 @@ struct Matrix4x4 {
 };
 struct Vector3 {
 	float x, y, z;
+	Vector3 operator+=(const Vector3& obj) { // 機能の拡張をしてるからvectorの中に入れてヨシ
+		Vector3 num{};
+		num.x = x + obj.x;
+		num.y = y + obj.y;
+		num.z = z + obj.z;
+
+		return num;
+	}
 };
 
 //void DrawTriangle(const Triangre& triangle,);
@@ -264,8 +272,8 @@ Matrix4x4 MakePerspectiveMatrix(float forY, float aspectRatio, float nearClip, f
 	resurt.m[0][0] = 1 / aspectRatio * cot * (forY / 2);
 	resurt.m[1][1] = cot * (forY / 2);
 	resurt.m[2][2] = farClip / (farClip - nearClip);
-	resurt.m[2][3] = -nearClip * farClip / (farClip - nearClip);
-	resurt.m[3][2] = 1;
+	resurt.m[2][3] = 1;
+	resurt.m[3][2] = -nearClip * farClip / (farClip - nearClip);
 	return resurt;
 };
 // 正射影行列
