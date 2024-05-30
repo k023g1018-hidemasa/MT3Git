@@ -114,10 +114,10 @@ Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float botto
 // 透視投影行列
 Matrix4x4 MakePerspectiveMatrix(float forY, float aspectRatio, float nearClip, float farClip) {
 	Matrix4x4 resurt{};
-	float s = 1; // しらんa/bってなんやねんもっと分かりやすくかけやヴぉけ
-	float cot = 1 / (std::tan(s));
-	resurt.m[0][0] = 1 / aspectRatio * cot * (forY / 2);
-	resurt.m[1][1] = cot * (forY / 2);
+	//float s = 1; // しらんa/bってなんやねんもっと分かりやすくかけやヴぉけ
+	float cot = 1 / (std::tan(forY/2));
+	resurt.m[0][0] = 1 / aspectRatio * cot;
+	resurt.m[1][1] = cot;
 	resurt.m[2][2] = farClip / (farClip - nearClip);
 	resurt.m[2][3] = 1;
 	resurt.m[3][2] = -nearClip* farClip / (farClip - nearClip);
