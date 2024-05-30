@@ -300,6 +300,18 @@ Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, f
 	resurt.m[3][3] = 1;
 	return resurt;
 };
+//グリッドの表示
+void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix,Matrix4x4& WorldMatrix){
+	const float kGridHalfwidth=2.0f;//グリッドの半分の幅
+	const uint32_t kSubdivision = 10;//分割数
+	const float kGridEvery = (kGridHalfwidth * 2.0f) / float(kSubdivision); // 一つ分の長さ
+	//奥から手前への線を順に引いていく
+	for (uint32_t xIndex = 0; xIndex <= kSubdivision;++xIndex) {
+		
+
+	}
+
+};
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label) {
 	Novice::ScreenPrintf(x, y - 20, "%s", label);
 	for (int row = 0; row < 4; ++row) {
