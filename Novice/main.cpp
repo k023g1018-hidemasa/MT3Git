@@ -43,13 +43,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//	Matrix4x4 worldMatrix = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, rotate, translate);
 	//	Matrix4x4 cameraMatrix = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, 1);
 		if (keys[DIK_A]) {
-			rotate.x += 3;
-			rotate.y += 3;
-			rotate.z += 3;
+			rotate.x += 0.01f;
+		    rotate.y += 0.01f;
+		    rotate.z += 0.01f;
 		}else if (keys[DIK_D]) {
-			rotate.x -= 3;
-			rotate.y -= 3;
-			rotate.z -= 3;
+			rotate.x -= 0.01f;
+		    rotate.y -= 0.01f;
+		    rotate.z -= 0.01f;
 		}
 		if (keys[DIK_W]) {
 			translate.x += 3;
