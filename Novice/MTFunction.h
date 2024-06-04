@@ -6,22 +6,22 @@
 
 static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
-static const int kWindowWidth = 1280;
-static const int kWindoweHeight = 720;
+static const int kWindowWidth = 128;
+static const int kWindoweHeight = 72;
 
 struct Matrix4x4 {
 	float m[4][4];
 };
 struct Vector3 {
 	float x, y, z;
-	Vector3 operator+=(const Vector3& obj) { // 機能の拡張をしてるからvectorの中に入れてヨシ
-		Vector3 num{};
-		num.x = x + obj.x;
-		num.y = y + obj.y;
-		num.z = z + obj.z;
+//	Vector3 operator+=(const Vector3& obj) { // 機能の拡張をしてるからvectorの中に入れてヨシ
+	//	Vector3 num{};
+		//num.x = x + obj.x;
+		//num.y = y + obj.y;
+		//num.z = z + obj.z;
 
-		return num;
-	}
+		//return num;
+	//}
 };
 
 //void DrawTriangle(const Triangre& triangle,);
@@ -267,10 +267,10 @@ Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Ve
 // 透視投影行列
 Matrix4x4 MakePerspectiveMatrix(float forY, float aspectRatio, float nearClip, float farClip) {
 	Matrix4x4 resurt{};
-	float s = 1; // しらん
-	float cot = 1 / (std::tan(s));
-	resurt.m[0][0] = 1 / aspectRatio * cot * (forY / 2);
-	resurt.m[1][1] = cot * (forY / 2);
+	// float s = 1; // しらんa/bってなんやねんもっと分かりやすくかけやヴぉけ
+	float cot = 1 / (std::tan(forY / 2));
+	resurt.m[0][0] = 1 / aspectRatio * cot;
+	resurt.m[1][1] = cot;
 	resurt.m[2][2] = farClip / (farClip - nearClip);
 	resurt.m[2][3] = 1;
 	resurt.m[3][2] = -nearClip * farClip / (farClip - nearClip);

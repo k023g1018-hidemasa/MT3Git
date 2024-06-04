@@ -19,11 +19,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 cross = Cross(v1, v2);
 
 	Vector3 rotate{};//ゼロで初期化
-	Vector3 translate{100.0f, 100.0f, 100.0f};
-	Vector3 cameraPosition{1.0f,1.0f,1.0f};//多分ALとのこと,なかった//ここは多分前後に動いたときの変数
-	Vector3 kLocalVertices[3]{300.0f, 600.0f, 100.0f,//ここを回転させるときに動く多分最初は定数でヨシ
-		100.0f, 300.0f, 300.0f, 
-		600.0f, 300.0f, 600.0f};
+	Vector3 translate{1.0f, 1.0f, 1.0f};
+	Vector3 cameraPosition{100.0f,100.0f,100.0f};//多分ALとのこと,なかった//ここは多分前後に動いたときの変数
+	Vector3 kLocalVertices[3]{3.0f, 3.0f, 1.0f,//ここを回転させるときに動く多分最初は定数でヨシ
+		1.0f, 6.0f, 1.0f, 
+		6.0f, 6.0f, 1.0f};
 	
 
 
@@ -84,15 +84,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		VectorScreenPrintf(0, 0, cross, "Cross");
 
 		Novice::DrawTriangle(
-		    int(screenVertices[0].x), int(screenVertices[0].y), int(screenVertices[1].x), int(screenVertices[1].y)
+		     int(screenVertices[0].x), int(screenVertices[0].y)
+			,int(screenVertices[1].x), int(screenVertices[1].y)
 			,int(screenVertices[2].x),int(screenVertices[2].y),RED,kFillModeSolid
 		);
-		Novice::DrawTriangle(
+		/*Novice::DrawTriangle(
 		    300, 300,
-			100, 300,
-			600, 300,
+			100, 600,
+			600, 600,
 			RED, kFillModeSolid
-		);
+		);*/
 
 		Novice::ScreenPrintf(50, 50, "%d,%d,%d,%d,%d,%d",
 			int(screenVertices[0].x), int(screenVertices[0].y),
