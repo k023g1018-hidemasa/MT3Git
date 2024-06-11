@@ -5,6 +5,7 @@
 #include<assert.h>
 #include<ViewProjection.h>
 #include"Matrix4x4.h"
+#include"Vector3.h"
 
 static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
@@ -14,13 +15,20 @@ static const int kWindoweHeight = 720;
 //struct Matrix4x4 {
 //	float m[4][4];
 //};
-struct Vector3 {
-	float x, y, z;
-	
-};
+//struct Vector3  {
+//	float x;
+//	float y;
+//	float z; // 認識できない退寮に出たら多分コンストの影響
+// なんでこいつらじゃなくてヘッダファイルならエラー出ないの？
+//	
+//};
 struct Sphere {
 	Vector3 center;//中心点ではない？
 	float radius;//半径より大きくない？
+};
+
+struct Segment {
+
 };
 
 
@@ -303,13 +311,12 @@ void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMa
 	// 奥から手前への線を順に引いていく
 	for (uint32_t xIndex = 0; xIndex <= kSubdivision; ++xIndex) {
 		float rainnohaba = 0;
-		float sitenX = 100;
-		float sitenY = 300;
-		float syuutennX = 500;//とりあえず場所適当に
-		float syuutennY = 300;
+		float sitenX = 100.0f;
+		float sitenY = 300.0f;
+		float syuutennX = 500.0f;//とりあえず場所適当に
+		float syuutennY = 300.0f;
 		rainnohaba = kGridHalfwidth * xIndex;//コレで均等に幅が取れる？
-
-		Novice::DrawLine(sitenX, sitenY, syuutennX, syuutennY, 0xAAAAAAFF);
+		Novice::DrawLine(sitenX, sitenY, syuutennX, syuutennY, 0xAAAAAAFF);//フロートにキャストが必要
 		//ビュープロジェクションマトリクス手なに？どこにいあいあ
 		//関数どう当てはめるんか分からん
 		//多分ビューポートで数字取ってきてラインの視点終点見つけるんやけど数字のあてはめ方知らん
@@ -366,6 +373,9 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 		}
 	}
 }
+
+
+
 
 
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label) {
