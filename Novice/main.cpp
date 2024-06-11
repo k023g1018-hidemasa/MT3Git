@@ -13,7 +13,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char keys[256] = {0};
 	char preKeys[256] = {0};
 
-
+	ViewProjection viewProjection_;
 
 	
 
@@ -40,6 +40,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		/// ↓描画処理ここから
 		///
+
+		DrawGrid(viewProjection_, MakeViewportMatrix(1, 1, 2, 2, 1, 1));
+
 
         ///	
 		/// ↑描画処理ここまで

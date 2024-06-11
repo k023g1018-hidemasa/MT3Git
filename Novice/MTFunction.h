@@ -3,28 +3,26 @@
 #include<cmath>
 #include<math.h>
 #include<assert.h>
+#include<ViewProjection.h>
+#include"Matrix4x4.h"
 
 static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
 static const int kWindowWidth = 1280;
 static const int kWindoweHeight = 720;
 
-struct Matrix4x4 {
-	float m[4][4];
-};
+//struct Matrix4x4 {
+//	float m[4][4];
+//};
 struct Vector3 {
 	float x, y, z;
-	Vector3 operator+=(const Vector3& obj) { // 機能の拡張をしてるからvectorの中に入れてヨシ
-		Vector3 num{};
-		num.x = x + obj.x;
-		num.y = y + obj.y;
-		num.z = z + obj.z;
-
-		return num;
-	}
+	
+};
+struct Sphere {
+	Vector3 center;//中心点ではない？
+	float radius;//半径より大きくない？
 };
 
-//void DrawTriangle(const Triangre& triangle,);
 
 Vector3 Cross(const Vector3& v1, const Vector3& v2) {
 	Vector3 resurt{};
@@ -89,15 +87,13 @@ float Dot(const Vector3& v1, const Vector3& v2) {
 	float result;
 	result = (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z);
 	return result;
-	
-}
+};
 
 float Length(const Vector3& v) {
 	float result;
 	result = sqrtf((v.x * v.x) + (v.y * v.y) + (v.z * v.z));
 	return result;
-	
-}
+};
 
 Vector3 Normalize(const Vector3& v) {
 	Vector3 result{};
@@ -157,7 +153,7 @@ Matrix4x4 Inverse(Matrix4x4 a) {
 	                      a.m[0][1] * a.m[1][0] * a.m[2][2] - a.m[0][0] * a.m[1][2] * a.m[2][1]);
 	// 10ページのAをあたまにいれて今作ってるやつはA()でおけ
 	return result;
-}
+};
 
 Matrix4x4 Multiply(Matrix4x4 a, Matrix4x4 b) {
 	Matrix4x4 result{};
@@ -181,7 +177,7 @@ Matrix4x4 Multiply(Matrix4x4 a, Matrix4x4 b) {
 	result.m[3][2] = a.m[3][0] * b.m[0][2] + a.m[3][1] * b.m[1][2] + a.m[3][2] * b.m[2][2] + a.m[3][3] * b.m[3][2]; // 3列
 	result.m[3][3] = a.m[3][0] * b.m[0][3] + a.m[3][1] * b.m[1][3] + a.m[3][2] * b.m[2][3] + a.m[3][3] * b.m[3][3]; // 4列
 	return result;
-}
+};
 Matrix4x4 Scale(const Vector3& a) {
 	Matrix4x4 result{};
 	result.m[0][0] = a.x;
@@ -218,7 +214,7 @@ Matrix4x4 Transpose(const Matrix4x4 a) { // 12コイル
 	retult.m[3][3] = a.m[3][3];
 
 	return retult;
-}
+};
 
 Matrix4x4 MakeTranslateMatrix(const Vector3& translate) {
 	Matrix4x4 result{};
@@ -300,17 +296,78 @@ Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, f
 	return resurt;
 };
 //グリッドの表示
-void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix,Matrix4x4& WorldMatrix){
-	const float kGridHalfwidth=2.0f;//グリッドの半分の幅
-	const uint32_t kSubdivision = 10;//分割数
-	const float kGridEvery = (kGridHalfwidth * 2.0f) / float(kSubdivision); // 一つ分の長さ
-	//奥から手前への線を順に引いていく
-	for (uint32_t xIndex = 0; xIndex <= kSubdivision;++xIndex) {
-		
+void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix) { //,Matrix4x4& WorldMatrix
+	const float kGridHalfwidth = 2.0f;                                                  // グリッドの半分の幅
+	const uint32_t kSubdivision = 10;                                                   // 分割数
+	const float kGridEvery = (kGridHalfwidth * 2.0f) / float(kSubdivision);             // 一つ分の長さ
+	// 奥から手前への線を順に引いていく
+	for (uint32_t xIndex = 0; xIndex <= kSubdivision; ++xIndex) {
+		float rainnohaba = 0;
+		float sitenX = 100;
+		float sitenY = 300;
+		float syuutennX = 500;//とりあえず場所適当に
+		float syuutennY = 300;
+		rainnohaba = kGridHalfwidth * xIndex;//コレで均等に幅が取れる？
 
+		Novice::DrawLine(sitenX, sitenY, syuutennX, syuutennY, 0xAAAAAAFF);
+		//ビュープロジェクションマトリクス手なに？どこにいあいあ
+		//関数どう当てはめるんか分からん
+		//多分ビューポートで数字取ってきてラインの視点終点見つけるんやけど数字のあてはめ方知らん
 	}
-
 };
+void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+	const uint32_t kSubdivision=0; // 分割数
+	const float kLonEvery=0;//軽度分割一つ分の角度
+	const float kLatEvery=0;//緯度文の角度//この辺はまだ知らん
+	Vector3 siteRotate = {1,1,1};//si-ta
+	Vector3 faiRotate = {2, 2, 2};//jfai多分ここはカメラの値かな？uefukume
+	//横が緯度縦が軽度
+	float semicircleX = sphere.radius *std::cos(siteRotate.x);
+	float semicircleY = sphere.radius * std::sin(siteRotate.y); // 7の下の士気何？//si-taは数字を入れないといけない
+	//多分他でいうラディアンこいつにもｘｙｚがある//多分ここまでで半円
+	float concentricCirclesX=semicircleX*std::cos(faiRotate.x);//半円×ふぁいで同心円が出る先ほどのｙって前ページ？
+    float concentricCirclesZ=sphere.radius*std::cos(siteRotate.z)*std::sin(faiRotate.z);
+	//8の合わせるの意味がよく分からんがとりま球面上の原点（こ↑こ↓重要）ｐ
+	//まさかここのｒだけ違うとか言わんよねそれやったらク〇よこの()なんやねん絶対ｘｙｚやんフロートで作ってんのに持たせれるか
+	float originSphere = sphere.radius[std::cos(siteRotate.x) * std::cos(faiRotate.x), std::sin(siteRotate.y), std::cos(siteRotate.z) * std::sin(faiRotate.z)];
+	//球面上の座標ｑ用は級の座標//弾の中心はｃ担ってる
+	float q = sphere.center + originSphere;//ああああああオペランドの音ぉおぉ↑↑AL参照してそしてＡＬに移植して
+	//緯度の方向に分割-pi/~pi/2
+	// ここからが本番だっ！！知らんし
+	//なんやねんこのちっさいｄ
+	float siteD = pi / kLatEvery;//πってどうすんっけ
+
+	//緯度は横でｘでシータ、経度は縦でｙでファイ、＆みたいな形しやがって、、、
+	for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
+		float lat =  -pi / 2.0f + kLatEvery * latIndex;//今のイドマーフのπってどう出すん化？
+		//軽度の方向に分割0～2PI
+ 	    float faiD = 2 * pi / kLonEvery;
+		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex) {
+			//級は上から見たら縁になってるからファイっての使ったら中心の座標が出てくる？
+			//んでｘｙの縁を合わせたら+みたいに見えるのでそれをずらしたら急になる？差分は多分縁のずれ
+			float lon = lonIndex * kLonEvery;//これは今のイド
+			//world座標系でのabcを求めるこれは9ｐ？
+			Vector3 a, b, c;
+			a = {std::cos(siteRotate.x) * std::cos(faiRotate.x),
+				std::sin(siteRotate.y), 
+				std::cos(siteRotate.z) * std::sin(faiRotate.z)};
+			b = { std::cos(siteRotate.x + siteD) * std::cos(faiRotate.x), 
+				std::sin(siteRotate.y + siteD),
+				std::cos(siteRotate.z + siteD) * std::sin(faiRotate.y) };
+			c = {std::cos(siteRotate.z) * std::cos(faiRotate.x + faiD),
+				std::sin(siteRotate.y),
+				std::cos(siteRotate.z) * std::sin(faiRotate.z + faiD)};
+			//abcをスクリーンまで返還
+			//ab,bcで線を引く線を引くのは分かった、変換が分からん
+
+			Novice::DrawLine();
+			Novice::DrawLine();
+
+		}
+	}
+}
+
+
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label) {
 	Novice::ScreenPrintf(x, y - 20, "%s", label);
 	for (int row = 0; row < 4; ++row) {
@@ -318,11 +375,12 @@ void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label
 			Novice::ScreenPrintf(x + column * kColumnWidth, y + row * kRowHeight, "%6.02f", matrix.m[row][column]);
 		}
 	}
-}
-
+};
 void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label) {
 	Novice::ScreenPrintf(x, y, "%.02f", vector.x);
 	Novice::ScreenPrintf(x + kColumnWidth, y, "%.02f", vector.y);
 	Novice::ScreenPrintf(x + kColumnWidth * 2, y, "%.02f", vector.z);
 	Novice::ScreenPrintf(x + kColumnWidth * 3, y, "%s", label);
 };
+
+
