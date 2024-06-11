@@ -19,13 +19,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 cross = Cross(v1, v2);
 
 	Vector3 rotate{};//ゼロで初期化//ここで回る
-	Vector3 translate{1.0f, 1.0f, 1.0f};//コレででかくなる
-	Vector3 cameraPosition{100.0f,100.0f,100.0f};//多分ALとのこと,なかった//ここは多分前後に動いたときの変数？？？？？
+	Vector3 translate{0.0f, 0.0f, 0.0f};//コレででかくなる
+	Vector3 cameraPosition{0.0f,0.0f,-5.0f};//多分ALとのこと,なかった//ここは多分前後に動いたときの変数？？？？？
 	//↑じゃこれ何？ここの数字いじったら座標おかしくなった
-	Vector3 kLocalVertices[3]{3.0f, 3.0f, 1.0f,//ここを回転させるときに動く多分最初は定数でヨシ
-		1.0f, 6.0f, 1.0f, 
-		6.0f, 6.0f, 1.0f};//多分ここで三角形の大まかなでかさ決めてると思われ
-	
+	Vector3 kLocalVertices[3]{
+		0.0f, 0.5f, 0.0f,//ここを回転させるときに動く多分最初は定数でヨシ
+		0.5f, -0.5f, 0.0f, 
+		-0.5f, -0.5f, 0.0f};//多分ここで三角形の大まかなでかさ決めてると思われ
+	//ローカル座標の最大は1でそれ以上になると画面外に行く
 
 
 	//今これどうゆう状況？なんで設定した値より数倍でかいしどっか行ってんの？カメラポジションて何？
@@ -46,23 +47,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 	//	Matrix4x4 worldMatrix = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, rotate, translate);
 	//	Matrix4x4 cameraMatrix = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, 1);
+
+		rotate.y += 0.01f;
+
 		if (keys[DIK_A]) {
-			rotate.x += 0.01f;
-		    rotate.y += 0.01f;
-		    rotate.z += 0.01f;
+			translate.x += 0.001f;
 		}else if (keys[DIK_D]) {
-			rotate.x -= 0.01f;
-		    rotate.y -= 0.01f;
-		    rotate.z -= 0.01f;
+			translate.x -= 0.001f;
 		}
 		if (keys[DIK_W]) {
-			translate.x += 3;
-			translate.y += 3;
-			translate.z += 3;
+			//translate.x += 3;
+			//translate.y += 3;
+			translate.z += 0.001f;
 		} else if (keys[DIK_S]) {
-			translate.x -= 3;
-			translate.y -= 3;
-			translate.z -= 3;
+			//translate.x -= 3;
+			//translate.y -= 3;
+			translate.z -= 0.001f;
+			//この辺の軸は移動させたい奴だけ残しとく
+			//ブレンダーとかの軸固定したやつって考えとく
 		}
 
 	Matrix4x4 worldMatrix = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, rotate, translate);
@@ -102,10 +104,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			RED, kFillModeSolid
 		);*/
 
-		Novice::ScreenPrintf(50, 50, "%d,%d,%d,%d,%d,%d",
-			int(screenVertices[0].x), int(screenVertices[0].y),
-			int(screenVertices[1].x), int(screenVertices[1].y),
-			int(screenVertices[2].x),int(screenVertices[2].y)
+		Novice::ScreenPrintf(50, 50, "%.02f,%.02f,%.02f,%.02f,%.02f,%.02f",
+			screenVertices[0].x, screenVertices[0].y,
+			screenVertices[1].x,screenVertices[1].y,
+			screenVertices[2].x,screenVertices[2].y
 		);
 		VectorScreenPrintf(90, 90, rotate, "rotate");
 		VectorScreenPrintf(90, 90*2, translate, "translate");

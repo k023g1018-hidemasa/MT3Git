@@ -6,8 +6,8 @@
 
 static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
-static const int kWindowWidth = 128;
-static const int kWindoweHeight = 72;
+static const int kWindowWidth = 1280;
+static const int kWindoweHeight = 720;
 
 struct Matrix4x4 {
 	float m[4][4];
