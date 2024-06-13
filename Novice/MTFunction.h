@@ -1,10 +1,13 @@
 #pragma once
+
+#define _USE_MATH_DEFINES
 #include <Novice.h>
 #include<cmath>
 #include<math.h>
 #include<assert.h>
 #include<ViewProjection.h>
 #include"Matrix4x4.h"
+
 
 static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
@@ -14,10 +17,10 @@ static const int kWindoweHeight = 720;
 //struct Matrix4x4 {
 //	float m[4][4];
 //};
-struct Vector3 {
-	float x, y, z;
-	
-};
+//struct Vector3 {
+//	float x, y, z;
+//	
+//};
 struct Sphere {
 	Vector3 center;//中心点ではない？
 	float radius;//半径より大きくない？
@@ -302,66 +305,72 @@ void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMa
 	const float kGridEvery = (kGridHalfwidth * 2.0f) / float(kSubdivision);             // 一つ分の長さ
 	// 奥から手前への線を順に引いていく
 	for (uint32_t xIndex = 0; xIndex <= kSubdivision; ++xIndex) {
-		float rainnohaba = 0;
-		float sitenX = 100;
-		float sitenY = 300;
-		float syuutennX = 500;//とりあえず場所適当に
-		float syuutennY = 300;
-		rainnohaba = kGridHalfwidth * xIndex;//コレで均等に幅が取れる？
+	
+		float x  = -kGridHalfwidth + (xIndex * kGridEvery);//コレで均等に幅が取れる？
 
-		Novice::DrawLine(sitenX, sitenY, syuutennX, syuutennY, 0xAAAAAAFF);
+		Vector3 start = {x, 0.0f, -kGridHalfwidth};
+		Vector3 end = {x, 0.0f, kGridHalfwidth};
+
+		Vector3 screenStart = Transform(Transform(start, viewProjectionMatrix), viewportMatrix);
+		Vector3 screenEnd = Transform(Transform(end, viewProjectionMatrix), viewportMatrix);
+
+
+		Novice::DrawLine(int(screenStart.x), int(screenStart.y), int(screenEnd.x), int(screenEnd.y),0xAAAAAAFF);
+		//ビュープロジェクションマトリクス手なに？どこにいあいあ
+		//関数どう当てはめるんか分からん
+		//多分ビューポートで数字取ってきてラインの視点終点見つけるんやけど数字のあてはめ方知らん
+	}
+	for (uint32_t zIndex = 0; zIndex <= kSubdivision; ++zIndex) {
+	
+		float z  = -kGridHalfwidth + (zIndex * kGridEvery);//コレで均等に幅が取れる？
+
+		Vector3 start = {-kGridHalfwidth, 0.0f, z};
+		Vector3 end = {kGridHalfwidth, 0.0f, z};
+
+		Vector3 screenStart = Transform(Transform(start, viewProjectionMatrix), viewportMatrix);
+		Vector3 screenEnd = Transform(Transform(end, viewProjectionMatrix), viewportMatrix);
+
+
+		Novice::DrawLine(int(screenStart.x), int(screenStart.y), int(screenEnd.x), int(screenEnd.y),0xAAAAAAFF);
 		//ビュープロジェクションマトリクス手なに？どこにいあいあ
 		//関数どう当てはめるんか分からん
 		//多分ビューポートで数字取ってきてラインの視点終点見つけるんやけど数字のあてはめ方知らん
 	}
 };
 void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
-	const uint32_t kSubdivision=0; // 分割数
-	const float kLonEvery=0;//軽度分割一つ分の角度
-	const float kLatEvery=0;//緯度文の角度//この辺はまだ知らん
-	Vector3 siteRotate = {1,1,1};//si-ta
-	Vector3 faiRotate = {2, 2, 2};//jfai多分ここはカメラの値かな？uefukume
-	//横が緯度縦が軽度
-	float semicircleX = sphere.radius *std::cos(siteRotate.x);
-	float semicircleY = sphere.radius * std::sin(siteRotate.y); // 7の下の士気何？//si-taは数字を入れないといけない
-	//多分他でいうラディアンこいつにもｘｙｚがある//多分ここまでで半円
-	float concentricCirclesX=semicircleX*std::cos(faiRotate.x);//半円×ふぁいで同心円が出る先ほどのｙって前ページ？
-    float concentricCirclesZ=sphere.radius*std::cos(siteRotate.z)*std::sin(faiRotate.z);
-	//8の合わせるの意味がよく分からんがとりま球面上の原点（こ↑こ↓重要）ｐ
-	//まさかここのｒだけ違うとか言わんよねそれやったらク〇よこの()なんやねん絶対ｘｙｚやんフロートで作ってんのに持たせれるか
-	float originSphere = sphere.radius[std::cos(siteRotate.x) * std::cos(faiRotate.x), std::sin(siteRotate.y), std::cos(siteRotate.z) * std::sin(faiRotate.z)];
-	//球面上の座標ｑ用は級の座標//弾の中心はｃ担ってる
-	float q = sphere.center + originSphere;//ああああああオペランドの音ぉおぉ↑↑AL参照してそしてＡＬに移植して
-	//緯度の方向に分割-pi/~pi/2
-	// ここからが本番だっ！！知らんし
-	//なんやねんこのちっさいｄ
-	float siteD = pi / kLatEvery;//πってどうすんっけ
+	const uint32_t kSubdivision=12; // 分割数
+	const float kLonEvery=2.0f * float(M_PI) / kSubdivision;//軽度分割一つ分の角度 φd
+	const float kLatEvery=float(M_PI) / kSubdivision;//緯度文の角度//この辺はまだ知らん Θd
+
 
 	//緯度は横でｘでシータ、経度は縦でｙでファイ、＆みたいな形しやがって、、、
 	for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
-		float lat =  -pi / 2.0f + kLatEvery * latIndex;//今のイドマーフのπってどう出すん化？
+		float lat = float(M_PI) / 2.0f + kLatEvery * latIndex; // 今のイドマーフのπってどう出すん化？　Θ
 		//軽度の方向に分割0～2PI
- 	    float faiD = 2 * pi / kLonEvery;
 		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex) {
 			//級は上から見たら縁になってるからファイっての使ったら中心の座標が出てくる？
 			//んでｘｙの縁を合わせたら+みたいに見えるのでそれをずらしたら急になる？差分は多分縁のずれ
-			float lon = lonIndex * kLonEvery;//これは今のイド
+			float lon = lonIndex * kLonEvery;//これは今のイド φ
 			//world座標系でのabcを求めるこれは9ｐ？
 			Vector3 a, b, c;
-			a = {std::cos(siteRotate.x) * std::cos(faiRotate.x),
-				std::sin(siteRotate.y), 
-				std::cos(siteRotate.z) * std::sin(faiRotate.z)};
-			b = { std::cos(siteRotate.x + siteD) * std::cos(faiRotate.x), 
-				std::sin(siteRotate.y + siteD),
-				std::cos(siteRotate.z + siteD) * std::sin(faiRotate.y) };
-			c = {std::cos(siteRotate.z) * std::cos(faiRotate.x + faiD),
-				std::sin(siteRotate.y),
-				std::cos(siteRotate.z) * std::sin(faiRotate.z + faiD)};
+			a = {std::cos(lat) * std::cos(lon) * sphere.radius + sphere.center.x,
+				std::sin(lat), 
+				std::cos(lat) * std::sin(lon)};
+			b = { std::cos(lat + kLatEvery) * std::cos(lon), 
+				std::sin(lat + kLatEvery),
+				std::cos(lat + lon) * std::sin(lon) };
+			c = {std::cos(lat) * std::cos(lon+ kLonEvery),
+				std::sin(lat),
+				std::cos(lat) * std::sin(lon + kLonEvery)};
 			//abcをスクリーンまで返還
 			//ab,bcで線を引く線を引くのは分かった、変換が分からん
 
-			Novice::DrawLine();
-			Novice::DrawLine();
+			Vector3 screenA = Transform(Transform(a, viewProjectionMatrix), viewportMatrix);
+			Vector3 screenB = Transform(Transform(b, viewProjectionMatrix), viewportMatrix);
+			Vector3 screenC = Transform(Transform(c, viewProjectionMatrix), viewportMatrix);
+
+			Novice::DrawLine(int(screenA.x), int(screenA.y), int(screenB.x), int(screenB.y),WHITE);
+			Novice::DrawLine(int(screenA.x), int(screenA.y), int(screenC.x), int(screenC.y),WHITE);
 
 		}
 	}

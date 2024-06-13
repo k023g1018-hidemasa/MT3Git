@@ -15,8 +15,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	ViewProjection viewProjection_;
 
-	
-
+	Vector3 rotate{};
+	Vector3 translate{}; 
+	Vector3 cameraRotate = {0.26f};
+	Vector3 cameraPosition{0.0f, 1.9f, -6.49f}; 
 
 
 	// ウィンドウの×ボタンが押されるまでループ
@@ -33,6 +35,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 
+
+
+
 		///
 		/// ↑更新処理ここまで
 		///
@@ -41,7 +46,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 
-		DrawGrid(viewProjection_, MakeViewportMatrix(1, 1, 2, 2, 1, 1));
+
+		Matrix4x4 worldMatrix = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, rotate, translate);
+		Matrix4x4 cameraMatrix = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, cameraRotate, cameraPosition);
+		// ↑こいつが悪い気がするこれマジで意味わからん
+		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+		Matrix4x4 projectionMatrix = MakePerspectiveMatrix(0.45f, float(kWindowWidth) / float(kWindoweHeight), 0.1f, 100.0f);
+		Matrix4x4 viewProjectionMatrix = Multiply(viewMatrix,projectionMatrix);
+		Matrix4x4 viewportMatrix = MakeViewportMatrix(0, 0, float(kWindowWidth), float(kWindoweHeight), 0.0f, 1.0f);
+
+
+
+
+		DrawGrid(viewProjectionMatrix, viewportMatrix);
 
 
         ///	
