@@ -354,14 +354,14 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 			//world座標系でのabcを求めるこれは9ｐ？
 			Vector3 a, b, c;
 			a = {std::cos(lat) * std::cos(lon) * sphere.radius + sphere.center.x,
-				std::sin(lat), 
-				std::cos(lat) * std::sin(lon)};
-			b = { std::cos(lat + kLatEvery) * std::cos(lon), 
-				std::sin(lat + kLatEvery),
-				std::cos(lat + lon) * std::sin(lon) };
-			c = {std::cos(lat) * std::cos(lon+ kLonEvery),
-				std::sin(lat),
-				std::cos(lat) * std::sin(lon + kLonEvery)};
+				std::sin(lat)* sphere.radius + sphere.center.y, 
+				std::cos(lat) * std::sin(lon) * sphere.radius + sphere.center.z};
+			b = {std::cos(lat + kLatEvery) * std::cos(lon) * sphere.radius + sphere.center.x, 
+				std::sin(lat + kLatEvery) * sphere.radius + sphere.center.y,
+			    std::cos(lat + lon) * std::sin(lon) * sphere.radius + sphere.center.z};
+			c = {std::cos(lat) * std::cos(lon + kLonEvery) * sphere.radius + sphere.center.x,
+				std::sin(lat) * sphere.radius + sphere.center.y,
+			    std::cos(lat) * std::sin(lon + kLonEvery) * sphere.radius + sphere.center.z};
 			//abcをスクリーンまで返還
 			//ab,bcで線を引く線を引くのは分かった、変換が分からん
 
@@ -372,8 +372,11 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 			Novice::DrawLine(int(screenA.x), int(screenA.y), int(screenB.x), int(screenB.y),WHITE);
 			Novice::DrawLine(int(screenA.x), int(screenA.y), int(screenC.x), int(screenC.y),WHITE);
 
+
+
 		}
 	}
+	color =0xafaaaaff ;
 }
 
 
