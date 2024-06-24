@@ -1,4 +1,6 @@
 #pragma once
+#define _USE_MATH_DEFINES
+#include <Novice.h>
 #include <Novice.h>
 #include<cmath>
 #include<math.h>
@@ -28,7 +30,8 @@ struct Sphere {
 };
 
 struct Segment {
-
+	Vector3 origin; // 視点
+	Vector3 diff;   // 終点への差分ベクトル
 };
 
 
@@ -303,7 +306,99 @@ Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, f
 	resurt.m[3][3] = 1;
 	return resurt;
 };
+Vector3 Project(const Vector3& v1, const Vector3& v2) {
+	// 正射影ベクトル
+	// おいｃどっから出すねんabcなんか知るかｘｙｚで書いてくれ
+	Vector3 result;
+	float a = Dot(v1, v2);
+	float b = Dot(v2, v2);
+	result.x = a / b * v2.x;
+	result.y = a / b * v2.y;
+	result.z = a / b * v2.z;
+
+	return result;
+};
+// 最近接点
+Vector3 ClosestPoint(const Vector3& point, const Segment& segment) {
+
+	Vector3 project = Project(Subtract(point, segment.origin), segment.diff);
+
+	project = Add(segment.origin, project);
+	return project;
+};
 //グリッドの表示
+void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix) { //,Matrix4x4& WorldMatrix
+	const float kGridHalfwidth = 2.0f;                                                  // グリッドの半分の幅
+	const uint32_t kSubdivision = 10;                                                   // 分割数
+	const float kGridEvery = (kGridHalfwidth * 2.0f) / float(kSubdivision);             // 一つ分の長さ
+	// 奥から手前への線を順に引いていく
+	for (uint32_t xIndex = 0; xIndex <= kSubdivision; ++xIndex) {
+
+		float x = -kGridHalfwidth + (xIndex * kGridEvery); // コレで均等に幅が取れる？
+
+		Vector3 start = {x, 0.0f, -kGridHalfwidth};
+		Vector3 end = {x, 0.0f, kGridHalfwidth};
+
+		Vector3 screenStart = Transform(Transform(start, viewProjectionMatrix), viewportMatrix);
+		Vector3 screenEnd = Transform(Transform(end, viewProjectionMatrix), viewportMatrix);
+
+		Novice::DrawLine(int(screenStart.x), int(screenStart.y), int(screenEnd.x), int(screenEnd.y), 0xAAAAAAFF);
+		// ビュープロジェクションマトリクス手なに？どこにいあいあ
+		// 関数どう当てはめるんか分からん
+		// 多分ビューポートで数字取ってきてラインの視点終点見つけるんやけど数字のあてはめ方知らん
+	}
+	for (uint32_t zIndex = 0; zIndex <= kSubdivision; ++zIndex) {
+
+		float z = -kGridHalfwidth + (zIndex * kGridEvery); // コレで均等に幅が取れる？
+
+		Vector3 start = {-kGridHalfwidth, 0.0f, z};
+		Vector3 end = {kGridHalfwidth, 0.0f, z};
+
+		Vector3 screenStart = Transform(Transform(start, viewProjectionMatrix), viewportMatrix);
+		Vector3 screenEnd = Transform(Transform(end, viewProjectionMatrix), viewportMatrix);
+
+		Novice::DrawLine(int(screenStart.x), int(screenStart.y), int(screenEnd.x), int(screenEnd.y), 0xAAAAAAFF);
+		// ビュープロジェクションマトリクス手なに？どこにいあいあ
+		// 関数どう当てはめるんか分からん
+		// 多分ビューポートで数字取ってきてラインの視点終点見つけるんやけど数字のあてはめ方知らん
+	}
+};
+void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+	const uint32_t kSubdivision = 12;                          // 分割数
+	const float kLonEvery = 2.0f * float(M_PI) / kSubdivision; // 軽度分割一つ分の角度 φd
+	const float kLatEvery = float(M_PI) / kSubdivision;        // 緯度文の角度//この辺はまだ知らん Θd
+
+	// 緯度は横でｘでシータ、経度は縦でｙでファイ、＆みたいな形しやがって、、、
+	for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
+		float lat = float(M_PI) / 2.0f + kLatEvery * latIndex; // 今のイドマーフのπってどう出すん化？　Θ
+		// 軽度の方向に分割0～2PI
+		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex) {
+			// 級は上から見たら縁になってるからファイっての使ったら中心の座標が出てくる？
+			// んでｘｙの縁を合わせたら+みたいに見えるのでそれをずらしたら急になる？差分は多分縁のずれ
+			float lon = lonIndex * kLonEvery; // これは今のイド φ
+			// world座標系でのabcを求めるこれは9ｐ？
+			Vector3 a, b, c;
+			a = {std::cos(lat) * std::cos(lon) * sphere.radius + sphere.center.x, std::sin(lat) * sphere.radius + sphere.center.y, std::cos(lat) * std::sin(lon) * sphere.radius + sphere.center.z};
+			b = {
+			    std::cos(lat + kLatEvery) * std::cos(lon) * sphere.radius + sphere.center.x, std::sin(lat + kLatEvery) * sphere.radius + sphere.center.y,
+			    std::cos(lat + kLatEvery) * std::sin(lon) * sphere.radius + sphere.center.z};
+			c = {
+			    std::cos(lat) * std::cos(lon + kLonEvery) * sphere.radius + sphere.center.x, std::sin(lat) * sphere.radius + sphere.center.y,
+			    std::cos(lat) * std::sin(lon + kLonEvery) * sphere.radius + sphere.center.z};
+
+			// abcをスクリーンまで返還
+			// ab,bcで線を引く線を引くのは分かった、変換が分からん
+
+			Vector3 screenA = Transform(Transform(a, viewProjectionMatrix), viewportMatrix);
+			Vector3 screenB = Transform(Transform(b, viewProjectionMatrix), viewportMatrix);
+			Vector3 screenC = Transform(Transform(c, viewProjectionMatrix), viewportMatrix);
+
+			Novice::DrawLine(int(screenA.x), int(screenA.y), int(screenB.x), int(screenB.y), color);
+			Novice::DrawLine(int(screenA.x), int(screenA.y), int(screenC.x), int(screenC.y), color);
+		}
+	}
+	
+}
 
 
 
