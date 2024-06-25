@@ -5,7 +5,7 @@
 
 const char kWindowTitle[] = "GC2B_15_ヒラジマ_ヒデマサ＿MT3";
 
-		bool IsCollision(const Sphere& s1, const Sphere& s2) {
+		bool SphereIsCollision(const Sphere& s1, const Sphere& s2) {
 
 			float distance = Length(Subtract(s2.center, s1.center));
 
@@ -14,6 +14,7 @@ const char kWindowTitle[] = "GC2B_15_ヒラジマ_ヒデマサ＿MT3";
 			}
 			return false;
 		}
+		
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
@@ -34,6 +35,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	uint32_t color = WHITE;
 	debugCamera_ = new DebugCamera(1280, 720);
 
+	Segment segment{
+	    {-2.0f, -1.0f, 0.0f},
+        {3.0f,  2.0f,  2.0f}
+    };
 
 
 	// ウィンドウの×ボタンが押されるまでループ
@@ -49,7 +54,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 		
-		if (IsCollision(sphere1, sphere2)) {
+		if (SphereIsCollision(sphere1, sphere2)) {
 			color = RED;
 		} else {
 			color = WHITE;

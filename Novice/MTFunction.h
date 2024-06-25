@@ -37,6 +37,10 @@ struct Segment {
 	Vector3 diff;   // 終点への差分ベクトル
 };
 
+struct Plane {
+	Vector3 normal;
+	float distance;
+};
 
 Vector3 Cross(const Vector3& v1, const Vector3& v2) {
 	Vector3 resurt{};
@@ -328,7 +332,7 @@ Vector3 ClosestPoint(const Vector3& point, const Segment& segment) {
 	project = Add(segment.origin, project);
 	return project;
 };
-
+//平面描画の何かよくわからんが
 Vector3 Perpendicular(const Vector3& vector) {
 	if (vector.x != 0.0f || vector.y != 0.0f) {
 		return {-vector.y, vector.x, 0.0f};
