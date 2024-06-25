@@ -8,11 +8,14 @@
 #include<ViewProjection.h>
 #include"Matrix4x4.h"
 #include"Vector3.h"
+#include"DebugCamera.h"
 
 static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
 static const int kWindowWidth = 1280;
 static const int kWindoweHeight = 720;
+DebugCamera* debugCamera_ = nullptr;
+
 
 //struct Matrix4x4 {
 //	float m[4][4];
@@ -308,7 +311,6 @@ Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, f
 };
 Vector3 Project(const Vector3& v1, const Vector3& v2) {
 	// 正射影ベクトル
-	// おいｃどっから出すねんabcなんか知るかｘｙｚで書いてくれ
 	Vector3 result;
 	float a = Dot(v1, v2);
 	float b = Dot(v2, v2);
@@ -326,6 +328,13 @@ Vector3 ClosestPoint(const Vector3& point, const Segment& segment) {
 	project = Add(segment.origin, project);
 	return project;
 };
+
+Vector3 Perpendicular(const Vector3& vector) {
+	if (vector.x != 0.0f || vector.y != 0.0f) {
+		return {-vector.y, vector.x, 0.0f};
+	}
+	return {0.0f, -vector.z, vector.y};
+}
 //グリッドの表示
 void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix) { //,Matrix4x4& WorldMatrix
 	const float kGridHalfwidth = 2.0f;                                                  // グリッドの半分の幅
