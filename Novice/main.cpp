@@ -46,6 +46,13 @@ void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix,const M
 
 }
 
+void LineIsCollision(const Segment& segment,const Plane& plane) {
+
+	float dot = Dot(plane.normal,)
+
+
+}
+
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
