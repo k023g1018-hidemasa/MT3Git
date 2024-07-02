@@ -100,7 +100,7 @@ Vector3 Subtract(const Vector3& v1, const Vector3& v2) {
 	result.z = v1.z - v2.z;
 	return result;
 };
-
+//ない席
 float Dot(const Vector3& v1, const Vector3& v2) {
 	float result;
 	result = (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z);
@@ -412,7 +412,16 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 	}
 	
 }
+//魂同士の当たり判定
+bool SphereIsCollision(const Sphere& s1, const Sphere& s2) {
 
+	float distance = Length(Subtract(s2.center, s1.center));
+
+	if (distance <= s1.radius + s2.radius) {
+		return true;
+	}
+	return false;
+}
 
 
 

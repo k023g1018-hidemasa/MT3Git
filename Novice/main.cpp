@@ -5,16 +5,47 @@
 
 const char kWindowTitle[] = "GC2B_15_ヒラジマ_ヒデマサ＿MT3";
 
-		bool SphereIsCollision(const Sphere& s1, const Sphere& s2) {
+struct Plane {
+	Vector3 normal;
+	float distance;
 
-			float distance = Length(Subtract(s2.center, s1.center));
+};
 
-			if (distance <= s1.radius + s2.radius) {
-				return true;
-			}
-			return false;
-		}
+bool PlaneIsCollision(const Sphere& sphere, const Plane& plane) {
+	float d = plane.normal.x + plane.normal.y + plane.normal.z;
+	//nが法線の向き？ならｄはｎじゃないの？
+ 	Vector3 k;//平面と中心点の距離らしい
+	k = Dot(Normalize(plane.normal), Subtract(sphere.center, plane.normal));
+	//ここの変換てどうすんの｜中身↑｜らしいから多分返還しろってこと
+	//関数の中身知るかヴォケお前らみたいに脳みそ詰まってないんじゃ人のことも考えろや自己中どもが
+
+
+
+
+    Vector3	q=Subtract( sphere.center,Normalize(k));
+	//焼身
+}
 		
+void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix,const Matrix4x4 viewportMatrix ,uint32_t color) {
+	Vector3 center = Multiply(plane.distance,plane.normal);//変換がない何処にかいてんねん
+	Vector3 perpendicular[4];
+	perpendicular[0] = Normalize(Perpendicular(plane.normal));
+	perpendicular[1] = {-perpendicular[0].x, -perpendicular[0].y, -perpendicular[0].z};
+	perpendicular[2] = Cross(plane.normal, perpendicular[0]);
+	perpendicular[3] = {-perpendicular[2].x, -perpendicular[2].y, -perpendicular[2].z};
+
+	Vector3 points[4];
+	for (int32_t i = 0; i < 4; ++i) {
+		Vector3 extend = Multiply(2.0f, perpendicular[i]);
+		Vector3 point = Add(center, extend);
+		points[i] = Transform(Transform(point, viewProjectionMatrix), viewportMatrix);
+
+	}
+
+
+
+}
+
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
@@ -40,6 +71,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         {3.0f,  2.0f,  2.0f}
     };
 
+		Plane plane{};
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -54,11 +86,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 		
-		if (SphereIsCollision(sphere1, sphere2)) {
-			color = RED;
-		} else {
-			color = WHITE;
-		}
+
+
+
+		ImGui::DragFloat3("Plane.Normal", &plane.normal.x, 0.01f);
+		plane.normal = Normalize(plane.normal);
 
 		Matrix4x4 worldMatrix = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, rotate, translate);
 		Matrix4x4 cameraMatrix = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, cameraRotate, cameraPosition);
@@ -67,6 +99,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Matrix4x4 viewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
 		Matrix4x4 viewportMatrix = MakeViewportMatrix(0, 0, float(kWindowWidth), float(kWindoweHeight), 0.0f, 1.0f);
 
+		if (PlaneIsCollision(sphere1, plane)) {
+			color = RED;
+		} else {
+			color = WHITE;
+		}
 		debugCamera_->Update();
 
 		///
@@ -81,8 +118,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	
 		
 		DrawSphere(sphere1, viewProjectionMatrix, viewportMatrix, color);
-		DrawSphere(sphere2, viewProjectionMatrix, viewportMatrix, BLACK);
-
+		//DrawSphere(sphere2, viewProjectionMatrix, viewportMatrix, BLACK);
+		DrawPlane(plane, viewProjectionMatrix, viewportMatrix, WHITE);
 		
 
 		///
