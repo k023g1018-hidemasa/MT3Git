@@ -78,8 +78,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		DrawSphere(sphere1, viewProjectionMatrix, viewportMatrix, color);
 		DrawSphere(sphere2, viewProjectionMatrix, viewportMatrix, BLACK);
 
-		ImGui::Text("sphere1%f\nshere2%f", sphere1, sphere2);
-		//ImGui::InputFloat3("inputFloat3", sphere1.radius);
+
+		ImGui::Begin("Window");
+		ImGui::DragFloat3("Sphere1 Tranlate",&sphere1.center.x,0.01f);
+		ImGui::End();
 		//guiわっかんねあとはguiで中心点と半径を変えること？
 		//カメラもこれで変わるはずだけど変換の仕方が分からん
 
