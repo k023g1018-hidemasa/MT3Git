@@ -5,15 +5,33 @@
 
 const char kWindowTitle[] = "GC2B_15_ヒラジマ_ヒデマサ＿MT3";
 
-		bool IsCollision(const Sphere& s1, const Sphere& s2) {
+	bool PlaneIsCollision(const Sphere& sphere, const Plane& plane) {
+	float d = plane.normal.x + plane.normal.y + plane.normal.z;
+	// nが法線の向き？ならｄはｎじゃないの？
+	float k; // 平面と中心点の距離らしい
+	k = Dot(Normalize(plane.normal), Subtract(sphere.center, plane.normal));
+	// ここの変換てどうすんの｜中身↑｜らしいから多分返還しろってこと
+	// 関数の中身知るかヴォケお前らみたいに脳みそ詰まってないんじゃ人のことも考えろや自己中どもが
 
-			float distance = Length(Subtract(s2.center, s1.center));
+	Vector3 q = Subtract(sphere.center, Normalize(k));
+	// 焼身
+}
 
-			if (distance <= s1.radius + s2.radius) {
-				return true;
-			}
-			return false;
-		}
+void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4 viewportMatrix, uint32_t color) {
+	Vector3 center = Scale(plane.distance, plane.normal); // 変換がない何処にかいてんねん
+	Vector3 perpendicular[4];
+	perpendicular[0] = Normalize(Perpendicular(plane.normal));
+	perpendicular[1] = {-perpendicular[0].x, -perpendicular[0].y, -perpendicular[0].z};
+	perpendicular[2] = Cross(plane.normal, perpendicular[0]);
+	perpendicular[3] = {-perpendicular[2].x, -perpendicular[2].y, -perpendicular[2].z};
+
+	Vector3 points[4];
+	for (int32_t i = 0; i < 4; ++i) {
+		Vector3 extend =Scale(2.0f, perpendicular[i]);
+		Vector3 point = Add(center, extend);
+		points[i] = Transform(Transform(point, viewProjectionMatrix), viewportMatrix);
+	}
+}
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
@@ -31,6 +49,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Sphere sphere1 = {{}, 0.5f};
 	Sphere sphere2 = {{}, 0.3f};
+	Plane plane = {{}, 0.5f};
 	uint32_t color = WHITE;
 	debugCamera_ = new DebugCamera(1280, 720);
 
@@ -49,7 +68,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 		
-		if (IsCollision(sphere1, sphere2)) {
+		if (PlaneIsCollision(sphere1, plane)) {
 			color = RED;
 		} else {
 			color = WHITE;

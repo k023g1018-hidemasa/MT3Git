@@ -28,13 +28,18 @@ DebugCamera* debugCamera_ = nullptr;
 //	
 //};
 struct Sphere {
-	Vector3 center;//中心点ではない？
-	float radius;//半径より大きくない？
+	Vector3 center; // 中心点ではない？
+	float radius;   // 半径より大きくない？
 };
 
 struct Segment {
 	Vector3 origin; // 視点
 	Vector3 diff;   // 終点への差分ベクトル
+};
+
+struct Plane {
+	Vector3 normal;
+	float distance;
 };
 
 
@@ -192,12 +197,11 @@ Matrix4x4 Multiply(Matrix4x4 a, Matrix4x4 b) {
 	result.m[3][3] = a.m[3][0] * b.m[0][3] + a.m[3][1] * b.m[1][3] + a.m[3][2] * b.m[2][3] + a.m[3][3] * b.m[3][3]; // 4列
 	return result;
 };
-Matrix4x4 Scale(const Vector3& a) {
-	Matrix4x4 result{};
-	result.m[0][0] = a.x;
-	result.m[1][1] = a.y;
-	result.m[2][2] = a.z;
-	result.m[3][3] = 1;
+Vector3 Scale(float k,const Vector3& a) {
+	Vector3 result{};
+	result.x = a.x*k;
+	result.y = a.y*k;
+	result.z = a.z*k;
 	return result;
 };
 
@@ -270,8 +274,9 @@ Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Ve
 	Matrix4x4 rotateYMatrix = MakeRotateYMatrix(rotate.y);
 	Matrix4x4 rotateZMatrix = MakeRotateZMatrix(rotate.z);
 	Matrix4x4 rotateXYZMatrix =Multiply(rotateXMatrix, Multiply(rotateYMatrix, rotateZMatrix));
+	Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
 
-	return Multiply(Multiply(Scale(scale), rotateXYZMatrix), MakeTranslateMatrix(translate));
+	return Multiply(Multiply(scaleMatrix, rotateXYZMatrix), MakeTranslateMatrix(translate));
 };
 
 // 透視投影行列
