@@ -5,11 +5,7 @@
 
 const char kWindowTitle[] = "GC2B_15_ヒラジマ_ヒデマサ＿MT3";
 
-struct Plane {
-	Vector3 normal;
-	float distance;
 
-};
 
 bool PlaneIsCollision(const Sphere& sphere, const Plane& plane) {
 	float d = plane.normal.x + plane.normal.y + plane.normal.z;
@@ -39,12 +35,19 @@ void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix,const M
 		Vector3 extend = Multiply(2.0f, perpendicular[i]);
 		Vector3 point = Add(center, extend);
 		points[i] = Transform(Transform(point, viewProjectionMatrix), viewportMatrix);
-
 	}
-
-
-
 }
+
+void LineIsCollision(const Segment& segment, const Plane& plane) {
+	a=segment.origin+
+	float d = Dot(a,plane.normal)
+
+
+	float t = d - Dot(o, n) / Dot(b,Normalize(plane.normal))
+}
+
+
+
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -89,8 +92,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
-		ImGui::DragFloat3("Plane.Normal", &plane.normal.x, 0.01f);
-		plane.normal = Normalize(plane.normal);
+		//ImGui::DragFloat3("Plane.Normal", &plane.normal.x, 0.01f);
+		//plane.normal = Normalize(plane.normal);
 
 		Matrix4x4 worldMatrix = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, rotate, translate);
 		Matrix4x4 cameraMatrix = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, cameraRotate, cameraPosition);
@@ -99,11 +102,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Matrix4x4 viewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
 		Matrix4x4 viewportMatrix = MakeViewportMatrix(0, 0, float(kWindowWidth), float(kWindoweHeight), 0.0f, 1.0f);
 
-		if (PlaneIsCollision(sphere1, plane)) {
+	/*	if (PlaneIsCollision(sphere1, plane)) {
 			color = RED;
 		} else {
 			color = WHITE;
-		}
+		}*/
 		debugCamera_->Update();
 
 		///
