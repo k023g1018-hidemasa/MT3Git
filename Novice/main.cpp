@@ -39,9 +39,7 @@ bool LineIsCollision(const Segment& line, const Plane& plane) {
 	float t = (plane.distance - Dot(line.origin, plane.normal)) / dot;
 	// tを出してどうなる？
 }
-struct Triangle {
-	Vector3 vertices[3];
-};
+
 void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color){
 
 	//この中で変換させる？
@@ -49,21 +47,32 @@ void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatri
 		int(triangle.vertices[1].x),int(triangle.vertices[1].y),
 		int(triangle.vertices[2].x),int(triangle.vertices[2].y),color,kFillModeWireFrame);
 };
-bool ToriangleIsCollision(const Triangle& triangle, const Segment& segment){
 
+struct AABB {
+	Vector3 min;
+	Vector3 max;
+};
 
-	//説明求
-	Vector3 v1p=
+bool AABBIsCollision(const AABB& aabb1, const AABB& aabb2){
 
-	Vector3 cross01 = Cross(v01, v1p);
-	Vector3 cross12 = Cross(v12, v2p);
-	Vector3 cross20 = cross(v20, v0p);
-
-	if (Dot(cross01, normal) >= 0.0f &&
-		Dot(cross12, normal) >= 0.0f &&
-		Dot(cross20, normal) >= 0.0f) {
-
+	if ((aabb1.min.x <= aabb2.max.x && aabb1.max.x >= aabb2.min.x) &&
+		(aabb1.min.y <= aabb2.max.y && aabb1.max.y && aabb2.min.y) &&
+		(aabb1.min.z <= aabb2.max.z && aabb1.max.z && aabb2.min.z)) {
+		return true;//衝突？
 	}
+
+
+
+};
+void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color){
+	
+	Vector3 perpendicular[8];
+	perpendicular[0] = aabb.max;//上面の右上
+	perpendicular[1] = aabb.min.y+aabb.max.y;//ミニマムの上野店（上面の左下）
+	perpendicular[2] = aabb.max.x - aabb.min.x;//上面の左上
+	perpendicular[3] = aabb.max.z - aabb.max.z;
+	//こんな感じなんだろうけどヴェクターじゃないって言われるからよくわからん
+
 };
 
 // Windowsアプリでのエントリーポイント(main関数)
@@ -83,7 +92,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Sphere sphere1 = {{}, 0.5f};
 	Sphere sphere2 = {{}, 0.3f};
-	uint32_t color = WHITE;
+//	uint32_t color = WHITE;
 	debugCamera_ = new DebugCamera(1280, 720);
 
 	Segment segment{
@@ -92,6 +101,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     };
 
 	Plane plane{};
+
+	AABB aabb1{
+	    .min{-0.5f, -0.5f, -0.5f},
+	    .max{0.0f,  0.0f,  0.0f },
+	};
+	AABB aabb2{
+		.min{0.2f, 0.2f, 0.2f},
+        .max{1.0f,1.0f,1.0f},
+	};
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -133,9 +151,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(viewProjectionMatrix, viewportMatrix);
 
-		DrawSphere(sphere1, viewProjectionMatrix, viewportMatrix, color);
-		// DrawSphere(sphere2, viewProjectionMatrix, viewportMatrix, BLACK);
-		DrawPlane(plane, viewProjectionMatrix, viewportMatrix, WHITE);
+		//DrawSphere(sphere1, viewProjectionMatrix, viewportMatrix, color);
+		//// DrawSphere(sphere2, viewProjectionMatrix, viewportMatrix, BLACK);
+		//DrawPlane(plane, viewProjectionMatrix, viewportMatrix, WHITE);
+
+
+
 
 		///
 		/// ↑描画処理ここまで

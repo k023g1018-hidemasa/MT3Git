@@ -29,7 +29,9 @@ struct Sphere {
 	Vector3 center; // 中心点ではない？
 	float radius;   // 半径より大きくない？
 };
-
+struct Triangle {
+	Vector3 vertices[3];
+};
 struct Segment {
 	Vector3 origin; // 視点
 	Vector3 diff;   // 終点への差分ベクトル
