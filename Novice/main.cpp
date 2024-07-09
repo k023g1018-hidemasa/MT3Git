@@ -19,11 +19,11 @@ void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const 
 		Vector3 point = Add(center, extend);
 		points[i] = Transform(Transform(point, viewProjectionMatrix), viewportMatrix);
 	}
-	Novice::DrawLine(perpendicular[0].x, perpendicular[0].y, perpendicular[1].x, perpendicular[1].y, color);
-	Novice::DrawLine(perpendicular[0].x, perpendicular[0].y, perpendicular[2].x, perpendicular[2].y, color);
-	Novice::DrawLine(perpendicular[1].x, perpendicular[1].y, perpendicular[3].x, perpendicular[3].y, color);
-	Novice::DrawLine(perpendicular[2].x, perpendicular[2].y, perpendicular[3].x, perpendicular[3].y, color);
-
+	Novice::DrawLine(int(perpendicular[0].x), int(perpendicular[0].y), int(perpendicular[1].x), int(perpendicular[1].y), color);
+	Novice::DrawLine(int(perpendicular[0].x), int(perpendicular[0].y), int(perpendicular[2].x), int(perpendicular[2].y), color);
+	Novice::DrawLine(int(perpendicular[1].x), int(perpendicular[1].y), int(perpendicular[3].x), int(perpendicular[3].y), color);
+	Novice::DrawLine(int(perpendicular[2].x), int(perpendicular[2].y), int(perpendicular[3].x), int(perpendicular[3].y), color);
+	// mazuuturan
 
 }
 
@@ -41,6 +41,29 @@ bool LineIsCollision(const Segment& line, const Plane& plane) {
 }
 struct Triangle {
 	Vector3 vertices[3];
+};
+void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color){
+
+	//この中で変換させる？
+	Novice::DrawTriangle(int(triangle.vertices[0].x), int(triangle.vertices[0].y),
+		int(triangle.vertices[1].x),int(triangle.vertices[1].y),
+		int(triangle.vertices[2].x),int(triangle.vertices[2].y),color,kFillModeWireFrame);
+};
+bool ToriangleIsCollision(const Triangle& triangle, const Segment& segment){
+
+
+	//説明求
+	Vector3 v1p=
+
+	Vector3 cross01 = Cross(v01, v1p);
+	Vector3 cross12 = Cross(v12, v2p);
+	Vector3 cross20 = cross(v20, v0p);
+
+	if (Dot(cross01, normal) >= 0.0f &&
+		Dot(cross12, normal) >= 0.0f &&
+		Dot(cross20, normal) >= 0.0f) {
+
+	}
 };
 
 // Windowsアプリでのエントリーポイント(main関数)
