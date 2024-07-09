@@ -1,14 +1,13 @@
 #pragma once
 #define _USE_MATH_DEFINES
+#include "DebugCamera.h"
+#include "Matrix4x4.h"
+#include "Vector3.h"
 #include <Novice.h>
-#include <Novice.h>
-#include<cmath>
-#include<math.h>
-#include<assert.h>
-#include<ViewProjection.h>
-#include"Matrix4x4.h"
-#include"Vector3.h"
-#include"DebugCamera.h"
+#include <ViewProjection.h>
+#include <assert.h>
+#include <cmath>
+#include <math.h>
 
 static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
@@ -16,20 +15,19 @@ static const int kWindowWidth = 1280;
 static const int kWindoweHeight = 720;
 DebugCamera* debugCamera_ = nullptr;
 
-
-//struct Matrix4x4 {
+// struct Matrix4x4 {
 //	float m[4][4];
-//};
-//struct Vector3  {
+// };
+// struct Vector3  {
 //	float x;
 //	float y;
 //	float z; // 認識できない退寮に出たら多分コンストの影響
-// なんでこいつらじゃなくてヘッダファイルならエラー出ないの？
-//	
-//};
+//  なんでこいつらじゃなくてヘッダファイルならエラー出ないの？
+//
+// };
 struct Sphere {
-	Vector3 center;//中心点ではない？
-	float radius;//半径より大きくない？
+	Vector3 center; // 中心点ではない？
+	float radius;   // 半径より大きくない？
 };
 
 struct Segment {
@@ -48,7 +46,6 @@ Vector3 Cross(const Vector3& v1, const Vector3& v2) {
 	resurt.y = v1.z * v2.x - v1.x * v2.z;
 	resurt.z = v1.x * v2.y - v1.y * v2.x;
 	return resurt;
-	
 };
 
 Matrix4x4 MakeRotateXMatrix(float radian) {
@@ -100,7 +97,7 @@ Vector3 Subtract(const Vector3& v1, const Vector3& v2) {
 	result.z = v1.z - v2.z;
 	return result;
 };
-//ない席
+
 float Dot(const Vector3& v1, const Vector3& v2) {
 	float result;
 	result = (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z);
@@ -120,7 +117,6 @@ Vector3 Normalize(const Vector3& v) {
 	result.y = mag * v.y;
 	result.z = mag * v.z;
 	return result;
-
 };
 
 Matrix4x4 Inverse(Matrix4x4 a) {
@@ -196,12 +192,11 @@ Matrix4x4 Multiply(Matrix4x4 a, Matrix4x4 b) {
 	result.m[3][3] = a.m[3][0] * b.m[0][3] + a.m[3][1] * b.m[1][3] + a.m[3][2] * b.m[2][3] + a.m[3][3] * b.m[3][3]; // 4列
 	return result;
 };
-Matrix4x4 Scale(const Vector3& a) {
-	Matrix4x4 result{};
-	result.m[0][0] = a.x;
-	result.m[1][1] = a.y;
-	result.m[2][2] = a.z;
-	result.m[3][3] = 1;
+Vector3 Scale(float k, const Vector3& a) {
+	Vector3 result{};
+	result.x = a.x * k;
+	result.y = a.y * k;
+	result.z = a.z * k;
 	return result;
 };
 
@@ -273,16 +268,17 @@ Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Ve
 	Matrix4x4 rotateXMatrix = MakeRotateXMatrix(rotate.x);
 	Matrix4x4 rotateYMatrix = MakeRotateYMatrix(rotate.y);
 	Matrix4x4 rotateZMatrix = MakeRotateZMatrix(rotate.z);
-	Matrix4x4 rotateXYZMatrix =Multiply(rotateXMatrix, Multiply(rotateYMatrix, rotateZMatrix));
+	Matrix4x4 rotateXYZMatrix = Multiply(rotateXMatrix, Multiply(rotateYMatrix, rotateZMatrix));
+	Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
 
-	return Multiply(Multiply(Scale(scale), rotateXYZMatrix), MakeTranslateMatrix(translate));
+	return Multiply(Multiply(scaleMatrix, rotateXYZMatrix), MakeTranslateMatrix(translate));
 };
 
 // 透視投影行列
 Matrix4x4 MakePerspectiveMatrix(float forY, float aspectRatio, float nearClip, float farClip) {
 	Matrix4x4 resurt{};
 	float cot = 1 / (std::tan(forY / 2));
-	resurt.m[0][0] = 1 / aspectRatio *cot;
+	resurt.m[0][0] = 1 / aspectRatio * cot;
 	resurt.m[1][1] = cot;
 	resurt.m[2][2] = farClip / (farClip - nearClip);
 	resurt.m[2][3] = 1;
@@ -332,14 +328,14 @@ Vector3 ClosestPoint(const Vector3& point, const Segment& segment) {
 	project = Add(segment.origin, project);
 	return project;
 };
-//平面描画の何かよくわからんが
+
 Vector3 Perpendicular(const Vector3& vector) {
 	if (vector.x != 0.0f || vector.y != 0.0f) {
 		return {-vector.y, vector.x, 0.0f};
 	}
 	return {0.0f, -vector.z, vector.y};
 }
-//グリッドの表示
+// グリッドの表示
 void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix) { //,Matrix4x4& WorldMatrix
 	const float kGridHalfwidth = 2.0f;                                                  // グリッドの半分の幅
 	const uint32_t kSubdivision = 10;                                                   // 分割数
@@ -410,20 +406,7 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 			Novice::DrawLine(int(screenA.x), int(screenA.y), int(screenC.x), int(screenC.y), color);
 		}
 	}
-	
 }
-//魂同士の当たり判定
-bool SphereIsCollision(const Sphere& s1, const Sphere& s2) {
-
-	float distance = Length(Subtract(s2.center, s1.center));
-
-	if (distance <= s1.radius + s2.radius) {
-		return true;
-	}
-	return false;
-}
-
-
 
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label) {
 	Novice::ScreenPrintf(x, y - 20, "%s", label);
@@ -439,5 +422,3 @@ void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label) 
 	Novice::ScreenPrintf(x + kColumnWidth * 2, y, "%.02f", vector.z);
 	Novice::ScreenPrintf(x + kColumnWidth * 3, y, "%s", label);
 };
-
-
