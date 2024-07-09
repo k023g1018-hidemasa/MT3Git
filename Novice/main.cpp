@@ -25,10 +25,10 @@ void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const 
 	}
 }
 
-void LineIsCollision(const Segment& line, const Plane& plane) {
+bool LineIsCollision(const Segment& line, const Plane& plane) {
 	
 	float dot = Dot(plane.normal, line.diff);
-
+	//ドットがゼロらしい
 	if (dot == 0.0f) {
 		return false;
 	}
@@ -36,6 +36,9 @@ void LineIsCollision(const Segment& line, const Plane& plane) {
 		
 	//float t = d - Dot(o, n) / Dot(line.origin,Normalize(plane.normal))
 	float t = (plane.distance - Dot(line.origin, plane.normal)) / dot;
+	//tを出してどうなる？
+	
+
 
 }
 
