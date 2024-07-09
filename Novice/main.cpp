@@ -7,23 +7,10 @@ const char kWindowTitle[] = "GC2B_15_ヒラジマ_ヒデマサ＿MT3";
 
 
 
-bool PlaneIsCollision(const Sphere& sphere, const Plane& plane) {
-	float d = plane.normal.x + plane.normal.y + plane.normal.z;
-	//nが法線の向き？ならｄはｎじゃないの？
- 	Vector3 k;//平面と中心点の距離らしい
-	k = Dot(Normalize(plane.normal), Subtract(sphere.center, plane.normal));
-	//ここの変換てどうすんの｜中身↑｜らしいから多分返還しろってこと
-	//関数の中身知るかヴォケお前らみたいに脳みそ詰まってないんじゃ人のことも考えろや自己中どもが
 
-
-
-
-    Vector3	q=Subtract( sphere.center,Normalize(k));
-	//焼身
-}
 		
-void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix,const Matrix4x4 viewportMatrix ,uint32_t color) {
-	Vector3 center = Multiply(plane.distance,plane.normal);//変換がない何処にかいてんねん
+void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4 viewportMatrix, uint32_t color) {
+	Vector3 center = Scale(plane.distance, plane.normal); // 変換がない何処にかいてんねん
 	Vector3 perpendicular[4];
 	perpendicular[0] = Normalize(Perpendicular(plane.normal));
 	perpendicular[1] = {-perpendicular[0].x, -perpendicular[0].y, -perpendicular[0].z};
@@ -32,18 +19,24 @@ void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix,const M
 
 	Vector3 points[4];
 	for (int32_t i = 0; i < 4; ++i) {
-		Vector3 extend = Multiply(2.0f, perpendicular[i]);
+		Vector3 extend = Scale(2.0f, perpendicular[i]);
 		Vector3 point = Add(center, extend);
 		points[i] = Transform(Transform(point, viewProjectionMatrix), viewportMatrix);
 	}
 }
 
-void LineIsCollision(const Segment& segment, const Plane& plane) {
-	a=segment.origin+
-	float d = Dot(a,plane.normal)
+void LineIsCollision(const Segment& line, const Plane& plane) {
+	
+	float dot = Dot(plane.normal, line.diff);
 
+	if (dot == 0.0f) {
+		return false;
+	}
 
-	float t = d - Dot(o, n) / Dot(b,Normalize(plane.normal))
+		
+	//float t = d - Dot(o, n) / Dot(line.origin,Normalize(plane.normal))
+	float t = (plane.distance - Dot(line.origin, plane.normal)) / dot;
+
 }
 
 
