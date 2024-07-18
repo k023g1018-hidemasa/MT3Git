@@ -1,21 +1,25 @@
+#include "ImGuiManager.h"
 #include "MTFunction.h"
 #include <Novice.h>
-#include"ImGuiManager.h"
-//#include"ViewProjection.h"
+#include <cmath>
+// #include"ViewProjection.h"
 
 const char kWindowTitle[] = "GC2B_15_ヒラジマ_ヒデマサ＿MT3";
 
-//	bool PlaneIsCollision(const Sphere& sphere, const Plane& plane) {
-//	float d = plane.normal.x + plane.normal.y + plane.normal.z;
-//	// nが法線の向き？ならｄはｎじゃないの？
-//	float k; // 平面と中心点の距離らしい
-//	k = Dot(Normalize(plane.normal), Subtract(sphere.center, plane.normal));
-//	// ここの変換てどうすんの｜中身↑｜らしいから多分返還しろってこと
-//	// 関数の中身知るかヴォケお前らみたいに脳みそ詰まってないんじゃ人のことも考えろや自己中どもが
-//
-//	Vector3 q = Subtract(sphere.center, Normalize(k));
-//	// 焼身
-//}
+bool PlaneIsCollision(const Sphere& sphere, const Plane& plane) {
+	float d = plane.distance;
+	// nが法線の向き？ならｄはｎじゃないの？
+	Vector3 n = plane.normal;
+
+	Vector3 c = sphere.center;
+	float k; // 平面と中心点の距離らしい
+	k =  Dot(n,c)-d;
+	// ここの変換てどうすんの｜中身↑｜らしいから多分返還しろってこと
+	// 関数の中身知るかヴォケお前らみたいに脳みそ詰まってないんじゃ人のことも考えろや自己中どもが
+
+	return abs(k) <= sphere.radius;
+	// 焼身
+}
 
 void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4 viewportMatrix, uint32_t color) {
 	Vector3 center = Scale(plane.distance, plane.normal); // 変換がない何処にかいてんねん
@@ -27,15 +31,15 @@ void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const 
 
 	Vector3 points[4];
 	for (int32_t i = 0; i < 4; ++i) {
-		Vector3 extend =Scale(2.0f, perpendicular[i]);
+		Vector3 extend = Scale(2.0f, perpendicular[i]);
 		Vector3 point = Add(center, extend);
 		points[i] = Transform(Transform(point, viewProjectionMatrix), viewportMatrix);
 	}
-	Novice::DrawLine(int(perpendicular[0].x), int(perpendicular[0].y), int(perpendicular[1].x), int(perpendicular[1].y), color);
-	Novice::DrawLine(int(perpendicular[0].x), int(perpendicular[0].y), int(perpendicular[2].x), int(perpendicular[2].y), color);
-	Novice::DrawLine(int(perpendicular[1].x), int(perpendicular[1].y), int(perpendicular[3].x), int(perpendicular[3].y), color);
-	Novice::DrawLine(int(perpendicular[2].x), int(perpendicular[2].y), int(perpendicular[3].x), int(perpendicular[3].y), color);
-	//mazuuturan
+	Novice::DrawLine(int(points[3].x), int(points[3].y), int(points[1].x), int(points[1].y), color);
+	Novice::DrawLine(int(points[0].x), int(points[0].y), int(points[2].x), int(points[2].y), color);
+	Novice::DrawLine(int(points[0].x), int(points[0].y), int(points[3].x), int(points[3].y), color);
+	Novice::DrawLine(int(points[2].x), int(points[2].y), int(points[1].x), int(points[1].y), color);
+	// mazuuturan
 }
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -52,13 +56,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 cameraRotate = {0.26f};
 	Vector3 cameraPosition{0.0f, 1.9f, -6.49f};
 
+	Vector3 a = {1, 1, 0};
+	Vector3 b = {0.5, 0.5, 0};
+	Vector3 c = {0, 1, 0};
+	Vector3 v1 = Subtract(b, a);
+	Vector3 v2 = Subtract(c, b);
+
 	Sphere sphere1 = {{}, 0.5f};
 	Sphere sphere2 = {{}, 0.3f};
-	Plane plane = {{1,1,1}, 0.5f};
+	Plane plane = {Cross(v1, v2), 0.5f};
 	uint32_t color = WHITE;
 	debugCamera_ = new DebugCamera(1280, 720);
-
-
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -72,12 +80,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		/// ↓更新処理ここから
 		///
-		
-		/*if (PlaneIsCollision(sphere1, plane)) {
+
+		if (PlaneIsCollision(sphere1, plane)) {
 			color = RED;
 		} else {
 			color = WHITE;
-		}*/
+		}
 
 		Matrix4x4 worldMatrix = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, rotate, translate);
 		Matrix4x4 cameraMatrix = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, cameraRotate, cameraPosition);
@@ -97,11 +105,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		DrawGrid(viewProjectionMatrix, viewportMatrix);
-	
-		
+
 		DrawSphere(sphere1, viewProjectionMatrix, viewportMatrix, color);
-		//DrawSphere(sphere2, viewProjectionMatrix, viewportMatrix, BLACK);
-		DrawPlane(plane, viewProjectionMatrix, viewportMatrix, WHITE);
+		// DrawSphere(sphere2, viewProjectionMatrix, viewportMatrix, BLACK);
+		DrawPlane(plane, viewProjectionMatrix, viewportMatrix, RED);
+
+		ImGui::Begin("Window");
+		ImGui::DragFloat3("Sphere1 Tranlate", &sphere1.center.x, 0.01f);
+		ImGui::End();
 
 		///
 		/// ↑描画処理ここまで
