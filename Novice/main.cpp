@@ -6,41 +6,9 @@
 
 const char kWindowTitle[] = "GC2B_15_ヒラジマ_ヒデマサ＿MT3";
 
-bool PlaneIsCollision(const Sphere& sphere, const Plane& plane) {
-	float d = plane.distance;
-	// nが法線の向き？ならｄはｎじゃないの？
-	Vector3 n = plane.normal;
 
-	Vector3 c = sphere.center;
-	float k; // 平面と中心点の距離らしい
-	k =  Dot(n,c)-d;
-	// ここの変換てどうすんの｜中身↑｜らしいから多分返還しろってこと
-	// 関数の中身知るかヴォケお前らみたいに脳みそ詰まってないんじゃ人のことも考えろや自己中どもが
 
-	return abs(k) <= sphere.radius;
-	// 焼身
-}
 
-void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4 viewportMatrix, uint32_t color) {
-	Vector3 center = Scale(plane.distance, plane.normal); // 変換がない何処にかいてんねん
-	Vector3 perpendicular[4];
-	perpendicular[0] = Normalize(Perpendicular(plane.normal));
-	perpendicular[1] = {-perpendicular[0].x, -perpendicular[0].y, -perpendicular[0].z};
-	perpendicular[2] = Cross(plane.normal, perpendicular[0]);
-	perpendicular[3] = {-perpendicular[2].x, -perpendicular[2].y, -perpendicular[2].z};
-
-	Vector3 points[4];
-	for (int32_t i = 0; i < 4; ++i) {
-		Vector3 extend = Scale(2.0f, perpendicular[i]);
-		Vector3 point = Add(center, extend);
-		points[i] = Transform(Transform(point, viewProjectionMatrix), viewportMatrix);
-	}
-	Novice::DrawLine(int(points[3].x), int(points[3].y), int(points[1].x), int(points[1].y), color);
-	Novice::DrawLine(int(points[0].x), int(points[0].y), int(points[2].x), int(points[2].y), color);
-	Novice::DrawLine(int(points[0].x), int(points[0].y), int(points[3].x), int(points[3].y), color);
-	Novice::DrawLine(int(points[2].x), int(points[2].y), int(points[1].x), int(points[1].y), color);
-	// mazuuturan
-}
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
@@ -50,6 +18,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// キー入力結果を受け取る箱
 	char keys[256] = {0};
 	char preKeys[256] = {0};
+
+
 
 	Vector3 rotate{};
 	Vector3 translate{};
@@ -63,10 +33,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 v2 = Subtract(c, b);
 
 	Sphere sphere1 = {{}, 0.5f};
-	Sphere sphere2 = {{}, 0.3f};
+//	Sphere sphere2 = {{}, 0.3f};
 	Plane plane = {Cross(v1, v2), 0.5f};
 	uint32_t color = WHITE;
 	debugCamera_ = new DebugCamera(1280, 720);
+
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -80,12 +51,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		/// ↓更新処理ここから
 		///
+	ImGui::Begin("window");
+	ImGui::DragFloat3("sphere.Center", &sphere1.center.x, 0.01f);
+	ImGui::DragFloat("sphere.Radius", &sphere1.radius, 0.01f);
+	ImGui::DragFloat3("plane.NOrmal", &plane.normal.x, 0.01f);
+	ImGui::DragFloat("plane.distanve", &plane.distance, 0.01f);
+	ImGui::End();
 
-		if (PlaneIsCollision(sphere1, plane)) {
-			color = RED;
-		} else {
-			color = WHITE;
-		}
+	plane.normal = Normalize(plane.normal);
+
 
 		Matrix4x4 worldMatrix = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, rotate, translate);
 		Matrix4x4 cameraMatrix = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, cameraRotate, cameraPosition);
@@ -95,6 +69,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Matrix4x4 viewportMatrix = MakeViewportMatrix(0, 0, float(kWindowWidth), float(kWindoweHeight), 0.0f, 1.0f);
 
 		debugCamera_->Update();
+
+		if (PlaneIsCollision(sphere1, plane)) {
+			color = RED;
+		} else {
+			color = WHITE;
+		}
 
 		///
 		/// ↑更新処理ここまで
@@ -110,9 +90,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// DrawSphere(sphere2, viewProjectionMatrix, viewportMatrix, BLACK);
 		DrawPlane(plane, viewProjectionMatrix, viewportMatrix, RED);
 
-		ImGui::Begin("Window");
-		ImGui::DragFloat3("Sphere1 Tranlate", &sphere1.center.x, 0.01f);
-		ImGui::End();
+		
 
 		///
 		/// ↑描画処理ここまで

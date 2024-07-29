@@ -41,20 +41,6 @@ struct Plane {
 	Vector3 normal;
 	float distance;
 };
-bool PlaneIsCollision(const Sphere& sphere, const Plane& plane) {
-	float d = plane.distance;
-	// nが法線の向き？ならｄはｎじゃないの？
-	Vector3 n = plane.normal;
-
-	Vector3 c = sphere.center;
-	float k; // 平面と中心点の距離らしい
-	k = Dot(n, c) - d;
-	// ここの変換てどうすんの｜中身↑｜らしいから多分返還しろってこと
-	// 関数の中身知るかヴォケお前らみたいに脳みそ詰まってないんじゃ人のことも考えろや自己中どもが
-
-	return abs(k) <= sphere.radius;
-	// 焼身
-}
 
 
 
@@ -354,6 +340,20 @@ Vector3 Perpendicular(const Vector3& vector) {
 		return {-vector.y, vector.x, 0.0f};
 	}
 	return {0.0f, -vector.z, vector.y};
+}
+bool PlaneIsCollision(const Sphere& sphere, const Plane& plane) {
+	float d = plane.distance;
+	// nが法線の向き？ならｄはｎじゃないの？
+	Vector3 n = plane.normal;
+
+	Vector3 c = sphere.center;
+	float k; // 平面と中心点の距離らしい
+	k = Dot(n, c) - d;
+	// ここの変換てどうすんの｜中身↑｜らしいから多分返還しろってこと
+	// 関数の中身知るかヴォケお前らみたいに脳みそ詰まってないんじゃ人のことも考えろや自己中どもが
+
+	return abs(k) <= sphere.radius;
+	// 焼身
 }
 //グリッドの表示
 void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix) { //,Matrix4x4& WorldMatrix
