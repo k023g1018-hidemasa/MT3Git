@@ -117,7 +117,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	
 		
 		DrawSphere(sphere1, viewProjectionMatrix, viewportMatrix, color);
+
 		//DrawSphere(sphere2, viewProjectionMatrix, viewportMatrix, BLACK);
+
 		DrawPlane(plane, viewProjectionMatrix, viewportMatrix, WHITE);
 		
 
