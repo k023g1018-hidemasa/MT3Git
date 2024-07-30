@@ -5,75 +5,8 @@
 
 const char kWindowTitle[] = "GC2B_15_ヒラジマ_ヒデマサ＿MT3";
 
-void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4 viewportMatrix, uint32_t color) {
-	Vector3 center = Scale(plane.distance, plane.normal); // 変換がない何処にかいてんねん
-	Vector3 perpendicular[4];
-	perpendicular[0] = Normalize(Perpendicular(plane.normal));
-	perpendicular[1] = {-perpendicular[0].x, -perpendicular[0].y, -perpendicular[0].z};
-	perpendicular[2] = Cross(plane.normal, perpendicular[0]);
-	perpendicular[3] = {-perpendicular[2].x, -perpendicular[2].y, -perpendicular[2].z};
-
-	Vector3 points[4];
-	for (int32_t i = 0; i < 4; ++i) {
-		Vector3 extend = Scale(2.0f, perpendicular[i]);
-		Vector3 point = Add(center, extend);
-		points[i] = Transform(Transform(point, viewProjectionMatrix), viewportMatrix);
-	}
-	Novice::DrawLine(int(perpendicular[0].x), int(perpendicular[0].y), int(perpendicular[1].x), int(perpendicular[1].y), color);
-	Novice::DrawLine(int(perpendicular[0].x), int(perpendicular[0].y), int(perpendicular[2].x), int(perpendicular[2].y), color);
-	Novice::DrawLine(int(perpendicular[1].x), int(perpendicular[1].y), int(perpendicular[3].x), int(perpendicular[3].y), color);
-	Novice::DrawLine(int(perpendicular[2].x), int(perpendicular[2].y), int(perpendicular[3].x), int(perpendicular[3].y), color);
-	// mazuuturan
-
-}
-
-bool LineIsCollision(const Segment& line, const Plane& plane) {
-
-	float dot = Dot(plane.normal, line.diff);
-	// ドットがゼロらしい
-	if (dot == 0.0f) {
-		return false;
-	}
-
-	// float t = d - Dot(o, n) / Dot(line.origin,Normalize(plane.normal))
-	float t = (plane.distance - Dot(line.origin, plane.normal)) / dot;
-	// tを出してどうなる？
-}
-
-void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color){
-
-	//この中で変換させる？
-	Novice::DrawTriangle(int(triangle.vertices[0].x), int(triangle.vertices[0].y),
-		int(triangle.vertices[1].x),int(triangle.vertices[1].y),
-		int(triangle.vertices[2].x),int(triangle.vertices[2].y),color,kFillModeWireFrame);
-};
-
-struct AABB {
-	Vector3 min;
-	Vector3 max;
-};
-
-bool AABBIsCollision(const AABB& aabb1, const AABB& aabb2){
-
-	if ((aabb1.min.x <= aabb2.max.x && aabb1.max.x >= aabb2.min.x) &&
-		(aabb1.min.y <= aabb2.max.y && aabb1.max.y && aabb2.min.y) &&
-		(aabb1.min.z <= aabb2.max.z && aabb1.max.z && aabb2.min.z)) {
-		return true;//衝突？
-	}
 
 
-
-};
-void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color){
-	
-	Vector3 perpendicular[8];
-	perpendicular[0] = aabb.max;//上面の右上
-	perpendicular[1] = aabb.min.y+aabb.max.y;//ミニマムの上野店（上面の左下）
-	perpendicular[2] = aabb.max.x - aabb.min.x;//上面の左上
-	perpendicular[3] = aabb.max.z - aabb.max.z;
-	//こんな感じなんだろうけどヴェクターじゃないって言われるからよくわからん
-
-};
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -91,25 +24,32 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 cameraPosition{0.0f, 1.9f, -6.49f};
 
 	Sphere sphere1 = {{}, 0.5f};
-	Sphere sphere2 = {{}, 0.3f};
-//	uint32_t color = WHITE;
-	debugCamera_ = new DebugCamera(1280, 720);
+	// Sphere sphere2 = {{}, 0.3f};
+	uint32_t color = WHITE;
+
+	Vector3 a = {1, 1, 0};
+	Vector3 b = {0.5, 0.5, 0};
+	Vector3 c = {0, 1, 0};
+	Vector3 v1 = Subtract(b, a);
+	Vector3 v2 = Subtract(c, b);
+	Plane plane = {Cross(v1, v2), 0.5f};
 
 	Segment segment{
 	    {-2.0f, -1.0f, 0.0f},
         {3.0f,  2.0f,  2.0f}
     };
+	Triangle triangle = {a, b, c};
 
-	Plane plane{};
+	AABB aabb1 = {
+	    {-0.5f,-0.5f, -0.5f},
+	    {0.5f, 0.5f, 0.5f},
+	};
+	AABB aabb2 = {
+	    {-0.4f,-0.4f,-0.5f},
+        {0.6f,0.6f,0.5f},
+    };
 
-	AABB aabb1{
-	    .min{-0.5f, -0.5f, -0.5f},
-	    .max{0.0f,  0.0f,  0.0f },
-	};
-	AABB aabb2{
-		.min{0.2f, 0.2f, 0.2f},
-        .max{1.0f,1.0f,1.0f},
-	};
+	debugCamera_ = new DebugCamera(1280, 720);
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -124,8 +64,28 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
-		// ImGui::DragFloat3("Plane.Normal", &plane.normal.x, 0.01f);
-		// plane.normal = Normalize(plane.normal);
+		ImGui::Begin("window");
+		ImGui::DragFloat3("aabb1,min", &aabb1.min.x,0.01f);
+		ImGui::DragFloat3("aabb1,max", &aabb1.max.x,0.01f);
+		ImGui::DragFloat3("aabb2,min", &aabb2.min.x,0.01f);
+		ImGui::DragFloat3("aabb2,max", &aabb2.max.x,0.01f);
+		ImGui::End();
+
+		aabb1.min.x = (std::min)(aabb1.min.x, aabb1.max.x);
+		aabb1.min.y = (std::min)(aabb1.min.y, aabb1.max.y);
+		aabb1.min.z = (std::min)(aabb1.min.z, aabb1.max.z);
+		aabb1.max.x = (std::max)(aabb1.min.x, aabb1.max.x);
+		aabb1.max.y = (std::max)(aabb1.min.y, aabb1.max.y);
+		aabb1.max.z = (std::max)(aabb1.min.z, aabb1.max.z);
+
+		aabb2.min.x = (std::min)(aabb2.min.x, aabb2.max.x);
+		aabb2.min.y = (std::min)(aabb2.min.y, aabb2.max.y);
+		aabb2.min.z = (std::min)(aabb2.min.z, aabb2.max.z);
+		aabb2.max.x = (std::max)(aabb2.min.x, aabb2.max.x);
+		aabb2.max.y = (std::max)(aabb2.min.y, aabb2.max.y);
+		aabb2.max.z = (std::max)(aabb2.min.z, aabb2.max.z);
+
+
 
 		Matrix4x4 worldMatrix = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, rotate, translate);
 		Matrix4x4 cameraMatrix = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, cameraRotate, cameraPosition);
@@ -134,11 +94,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Matrix4x4 viewProjectionMatrix = Multiply(viewMatrix, projectionMatrix);
 		Matrix4x4 viewportMatrix = MakeViewportMatrix(0, 0, float(kWindowWidth), float(kWindoweHeight), 0.0f, 1.0f);
 
-		/*	if (PlaneIsCollision(sphere1, plane)) {
-		        color = RED;
-		    } else {
-		        color = WHITE;
-		    }*/
+		if (AABBIsCollision(aabb1,aabb2)) {
+			color = RED;
+		} else {
+			color = WHITE;
+		}
 		debugCamera_->Update();
 
 		///
@@ -150,14 +110,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		DrawGrid(viewProjectionMatrix, viewportMatrix);
-
-		//DrawSphere(sphere1, viewProjectionMatrix, viewportMatrix, color);
-		//// DrawSphere(sphere2, viewProjectionMatrix, viewportMatrix, BLACK);
-		//DrawPlane(plane, viewProjectionMatrix, viewportMatrix, WHITE);
-
-
-
-
+		DrawAABB(aabb1, viewProjectionMatrix, viewportMatrix, color);
+		DrawAABB(aabb2, viewProjectionMatrix, viewportMatrix, WHITE);
 		///
 		/// ↑描画処理ここまで
 		///

@@ -29,9 +29,7 @@ struct Sphere {
 	Vector3 center; // 中心点ではない？
 	float radius;   // 半径より大きくない？
 };
-struct Triangle {
-	Vector3 vertices[3];
-};
+
 struct Segment {
 	Vector3 origin; // 視点
 	Vector3 diff;   // 終点への差分ベクトル
@@ -40,6 +38,15 @@ struct Segment {
 struct Plane {
 	Vector3 normal;
 	float distance;
+};
+
+struct Triangle {
+	Vector3 vertices[3];
+};
+
+struct AABB {
+	Vector3 min;
+	Vector3 max;
 };
 
 Vector3 Cross(const Vector3& v1, const Vector3& v2) {
@@ -337,7 +344,54 @@ Vector3 Perpendicular(const Vector3& vector) {
 	}
 	return {0.0f, -vector.z, vector.y};
 }
-// グリッドの表示
+bool LineIsCollision(const Segment& segment, const Plane& plane) {
+	float dot = Dot(plane.normal, segment.diff);
+	if (dot != 0.0f) {
+		float t = (plane.distance - Dot(segment.origin, plane.normal)) / dot;
+		return (0 <= t) && (t <= 1);
+	}
+	return false;
+}
+bool ToriangleIsCollision(const Triangle& triangle, const Segment& segment) {
+	Vector3 v01 = Subtract(triangle.vertices[1], triangle.vertices[0]);
+	Vector3 v12 = Subtract(triangle.vertices[2], triangle.vertices[1]);
+	Vector3 normal = Normalize(Cross(v01, v12));
+	Plane plane{.normal = normal, .distance = Dot(triangle.vertices[0], normal)};
+	float dot = Dot(plane.normal, segment.diff);
+	if (dot == 0.0f) {
+		return false;
+	}
+	float t = (plane.distance - Dot(segment.origin, plane.normal)) / dot;
+	if ((t < 0) || (1 < t)) {
+		return false;
+	}
+	Vector3 intersect = Add(segment.origin, Scale(t, segment.diff));
+	Vector3 v1p = Subtract(intersect, triangle.vertices[1]);
+	if (Dot(Cross(v01, v1p), normal) < 0.0f) {
+		return false;
+	}
+	Vector3 v2p = Subtract(intersect, triangle.vertices[2]);
+	if (Dot(Cross(v12, v2p), normal) < 0.0f) {
+		return false;
+	}
+	Vector3 v0p = Subtract(intersect, triangle.vertices[0]);
+	Vector3 v20 = Subtract(triangle.vertices[0], triangle.vertices[2]);
+	if (Dot(Cross(v20, v0p), normal) < 0.0f) {
+		return false;
+	}
+	return true;
+};
+bool AABBIsCollision(const AABB& aabb1, const AABB& aabb2) {
+	return(aabb1.min.x<=aabb2.max.x&&aabb1.max.x>=aabb2.min.x)&&
+		(aabb1.min.y<=aabb2.max.y&&aabb1.max.y>=aabb2.min.y)&&
+		(aabb1.min.z<=aabb2.max.z&&aabb1.max.z>=aabb2.min.z);
+}
+    // グリッドの表示
+void DrawSegment(const Segment& segment, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewProtMatrix, uint32_t color) {
+	Vector3 start = Transform(Transform(segment.origin, viewProtMatrix), viewProtMatrix);
+	Vector3 end = Transform(Transform(Add(segment.origin, segment.diff), viewProjectionMatrix), viewProtMatrix);
+	Novice::DrawLine(int(start.x), int(start.y), int(end.x), int(end.y), color);
+}
 void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix) { //,Matrix4x4& WorldMatrix
 	const float kGridHalfwidth = 2.0f;                                                  // グリッドの半分の幅
 	const uint32_t kSubdivision = 10;                                                   // 分割数
@@ -408,6 +462,75 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 			Novice::DrawLine(int(screenA.x), int(screenA.y), int(screenC.x), int(screenC.y), color);
 		}
 	}
+}
+void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4 viewportMatrix, uint32_t color) {
+	Vector3 center = Scale(plane.distance, plane.normal); // 変換がない何処にかいてんねん
+	Vector3 perpendicular[4];
+	perpendicular[0] = Normalize(Perpendicular(plane.normal));
+	perpendicular[1] = {-perpendicular[0].x, -perpendicular[0].y, -perpendicular[0].z};
+	perpendicular[2] = Cross(plane.normal, perpendicular[0]);
+	perpendicular[3] = {-perpendicular[2].x, -perpendicular[2].y, -perpendicular[2].z};
+
+	Vector3 points[4];
+	for (int32_t i = 0; i < 4; ++i) {
+		Vector3 extend = Scale(2.0f, perpendicular[i]);
+		Vector3 point = Add(center, extend);
+		points[i] = Transform(Transform(point, viewProjectionMatrix), viewportMatrix);
+	}
+	Novice::DrawLine(int(points[3].x), int(points[3].y), int(points[1].x), int(points[1].y), color);
+	Novice::DrawLine(int(points[0].x), int(points[0].y), int(points[2].x), int(points[2].y), color);
+	Novice::DrawLine(int(points[0].x), int(points[0].y), int(points[3].x), int(points[3].y), color);
+	Novice::DrawLine(int(points[2].x), int(points[2].y), int(points[1].x), int(points[1].y), color);
+}
+void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+	Vector3 screenVertices[3] = {
+	    Transform(Transform(triangle.vertices[0], viewProjectionMatrix), viewportMatrix),
+	    Transform(Transform(triangle.vertices[1], viewProjectionMatrix), viewportMatrix),
+	    Transform(Transform(triangle.vertices[2], viewProjectionMatrix), viewportMatrix),
+	};
+	// この中で変換させる？
+	Novice::DrawTriangle(
+	    int(screenVertices[0].x), int(screenVertices[0].y), int(screenVertices[1].x), int(screenVertices[1].y), int(screenVertices[2].x), int(screenVertices[2].y), color, kFillModeWireFrame);
+};
+void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+	Vector3 vertices[8] = {
+	    {aabb.min.x, aabb.min.y, aabb.min.z},
+        {aabb.min.x, aabb.max.y, aabb.min.z},
+        {aabb.min.x, aabb.max.y, aabb.max.z},
+        {aabb.min.x, aabb.min.y, aabb.max.z},
+	    {aabb.max.x, aabb.min.y, aabb.min.z},
+        {aabb.max.x, aabb.max.y, aabb.min.z},
+        {aabb.max.x, aabb.max.y, aabb.max.z},
+        {aabb.max.x, aabb.min.y, aabb.max.z},
+	};
+
+	Vector3 screenVertices[8];
+	for (uint32_t index = 0; index < 8; ++index) {
+		screenVertices[index] = Transform(Transform(vertices[index], viewProjectionMatrix), viewportMatrix);
+	}
+
+	std::pair<uint32_t, uint32_t> indices[12] = {
+	    {0, 1},
+        {1, 2},
+        {2, 3},
+        {3, 0},
+        {4, 5},
+        {5, 6},
+        {6, 7},
+        {7, 4},
+        {0, 4},
+        {1, 5},
+        {2, 6},
+        {3, 7},
+	};
+	for (auto& index : indices) {
+		Novice::DrawLine(int(screenVertices[index.first].x), int(screenVertices[index.first].y),
+	    int(screenVertices[index.second].x), int(screenVertices[index.second].y),color);
+
+	}
+
+
+
 }
 
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label) {
