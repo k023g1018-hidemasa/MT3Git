@@ -400,6 +400,39 @@ bool AABBAndSphereIsCollision(const AABB& aabb, const Sphere& sphere) {
 
 	return distance <= sphere.radius;
 }
+bool AABBAndLineIsCollision(const AABB& aabb, const Segment& Segment) {
+	Vector3 mins;
+	mins.x = (aabb.min.x - Segment.origin.x) / Segment.diff.x;
+	mins.y = (aabb.min.y - Segment.origin.y) / Segment.diff.y;
+	mins.z = (aabb.min.z - Segment.origin.z) / Segment.diff.z;
+	Vector3 maxes;
+	maxes.x = (aabb.max.x - Segment.origin.x) / Segment.diff.x;
+	maxes.y = (aabb.max.y - Segment.origin.y) / Segment.diff.y;
+	maxes.z = (aabb.max.z - Segment.origin.z) / Segment.diff.z;
+	Vector3 nears;
+	nears.x = (std::min)(mins.x, maxes.x); 
+	nears.y = (std::min)(mins.y, maxes.y);
+	nears.z = (std::min)(mins.z, maxes.z);
+	Vector3 fars;
+	fars.x = (std::max)(mins.x, maxes.x);
+	fars.y = (std::max)(mins.y, maxes.y);
+	fars.z = (std::max)(mins.z, maxes.z);
+
+	float tMin = (std::max)(nears.x, (std::max)(nears.y, nears.z));
+	float tMax = (std::min)(fars.x, (std::min)(fars.y, fars.z));
+
+	if (tMin <= tMax) {
+		if ((tMin * tMax) < 0.0f) {
+			return true;
+		}
+		if (
+			0 <= tMin && tMin <= 1 ||
+			0 <= tMax && tMax <= 1) {
+			return true;
+		}
+	}
+	return false;
+}
     // グリッドの表示
 void DrawSegment(const Segment& segment, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewProtMatrix, uint32_t color) {
 	Vector3 start = Transform(Transform(segment.origin, viewProtMatrix), viewProtMatrix);
