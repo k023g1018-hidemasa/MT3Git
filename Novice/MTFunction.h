@@ -335,7 +335,21 @@ Vector3 Perpendicular(const Vector3& vector) {
 	}
 	return {0.0f, -vector.z, vector.y};
 }
+bool LineIsCollision(const Segment& segment, const Plane& plane) {
+	float dot = Dot(plane.normal, segment.diff);
+	if (dot != 0.0f) {
+		float t = (plane.distance - Dot(segment.origin, plane.normal)) / dot;
+		return (0 <= t) && (t <= 1);
+	}
+	return false;
+}
+
 // グリッドの表示
+void DrawSegment(const Segment& segment, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewProtMatrix, uint32_t color) {
+	Vector3 start = Transform(Transform(segment.origin, viewProtMatrix), viewProtMatrix);
+	Vector3 end = Transform(Transform(Add(segment.origin, segment.diff), viewProjectionMatrix), viewProtMatrix);
+	Novice::DrawLine(int(start.x), int(start.y), int(end.x), int(end.y), color);
+}
 void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix) { //,Matrix4x4& WorldMatrix
 	const float kGridHalfwidth = 2.0f;                                                  // グリッドの半分の幅
 	const uint32_t kSubdivision = 10;                                                   // 分割数
@@ -407,7 +421,25 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 		}
 	}
 }
+void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4 viewportMatrix, uint32_t color) {
+	Vector3 center = Scale(plane.distance, plane.normal); // 変換がない何処にかいてんねん
+	Vector3 perpendicular[4];
+	perpendicular[0] = Normalize(Perpendicular(plane.normal));
+	perpendicular[1] = {-perpendicular[0].x, -perpendicular[0].y, -perpendicular[0].z};
+	perpendicular[2] = Cross(plane.normal, perpendicular[0]);
+	perpendicular[3] = {-perpendicular[2].x, -perpendicular[2].y, -perpendicular[2].z};
 
+	Vector3 points[4];
+	for (int32_t i = 0; i < 4; ++i) {
+		Vector3 extend = Scale(2.0f, perpendicular[i]);
+		Vector3 point = Add(center, extend);
+		points[i] = Transform(Transform(point, viewProjectionMatrix), viewportMatrix);
+	}
+	Novice::DrawLine(int(points[3].x), int(points[3].y), int(points[1].x), int(points[1].y), color);
+	Novice::DrawLine(int(points[0].x), int(points[0].y), int(points[2].x), int(points[2].y), color);
+	Novice::DrawLine(int(points[0].x), int(points[0].y), int(points[3].x), int(points[3].y), color);
+	Novice::DrawLine(int(points[2].x), int(points[2].y), int(points[1].x), int(points[1].y), color);
+}
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label) {
 	Novice::ScreenPrintf(x, y - 20, "%s", label);
 	for (int row = 0; row < 4; ++row) {
